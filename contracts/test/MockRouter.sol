@@ -23,6 +23,19 @@ contract MockRouter is Governable {
         SafeERC20.safeTransferFrom(_token, _from, _to, _amount);
     }
 
+    function pluginLiquidateLiquidityPosition(
+        IMarketDescriptor _market,
+        address _account,
+        address _feeReceiver
+    ) external {}
+
+    function pluginLiquidatePosition(
+        IMarketDescriptor _market,
+        address _account,
+        Side _side,
+        address _feeReceiver
+    ) external {}
+
     function pluginIncreaseLiquidityPosition(
         IERC20 /*_market*/,
         address /*_account*/,

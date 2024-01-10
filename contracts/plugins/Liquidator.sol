@@ -22,6 +22,7 @@ contract Liquidator is ILiquidator, Governable {
         marketManager = _marketManager;
         usd = _usd;
         EFC = _efc;
+        priceFeed = _marketManager.priceFeed();
     }
 
     /// @inheritdoc ILiquidator
