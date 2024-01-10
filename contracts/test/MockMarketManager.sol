@@ -13,9 +13,9 @@ contract MockMarketManager {
     uint160 private longMarketPriceX96;
     uint160 private shortMarketPriceX96;
     IPriceFeed public priceFeed;
-    mapping(IMarketDescriptor market => mapping(address account => IMarketLiquidityPosition.LiquidityPosition liquidityPosition))
+    mapping(IMarketDescriptor market => mapping(address account => IMarketLiquidityPosition.LiquidityPosition))
         public liquidityPositions;
-    mapping(IMarketDescriptor market => mapping(address account => mapping(Side side => IMarketPosition.Position position)))
+    mapping(IMarketDescriptor market => mapping(address account => mapping(Side side => IMarketPosition.Position)))
         public positions;
     IMarketPosition.Position private position;
     IConfigurable.MarketFeeRateConfig private marketFeeRateConfig;

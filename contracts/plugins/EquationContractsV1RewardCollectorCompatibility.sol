@@ -5,8 +5,9 @@ import "../IEquationContractsV1Minimum.sol";
 
 /// @notice The contract implementation is used to be compatible with the farming rewards, referral fees,
 /// staking rewards and architect rewards of Equation Contracts V1
-/// @dev In order for this contract to work properly, it needs to be registered as a plugin of Equation Contracts V1's Router,
-/// and it needs to be registered as a collector of Equation Contracts V1's IFarmRewardDistributorV2
+/// @dev In order for this contract to work properly, it needs to be registered as a plugin of
+/// Equation Contracts V1's Router, and it needs to be registered as a collector of Equation
+/// Contracts V1's IFarmRewardDistributorV2
 abstract contract EquationContractsV1RewardCollectorCompatibility {
     IRouter public immutable routerV1;
     IFarmRewardDistributorV2 public immutable distributorV2;

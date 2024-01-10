@@ -69,9 +69,9 @@ contract LiquidatorTest is Test {
         liquidator.liquidateLiquidityPosition(IMarketDescriptor(MARKET), ACCOUNT, FEE_RECEIVER);
 
         vm.expectCall(
-            address(marketManager),
+            address(router),
             abi.encodeWithSignature(
-                "liquidateLiquidityPosition(address,address,address)",
+                "pluginLiquidateLiquidityPosition(address,address,address)",
                 MARKET,
                 ACCOUNT,
                 FEE_RECEIVER
@@ -94,9 +94,9 @@ contract LiquidatorTest is Test {
             1
         );
         vm.expectCall(
-            address(marketManager),
+            address(router),
             abi.encodeWithSignature(
-                "liquidatePosition(address,address,uint8,address)",
+                "pluginLiquidatePosition(address,address,uint8,address)",
                 MARKET,
                 ACCOUNT,
                 LONG,
@@ -125,9 +125,9 @@ contract LiquidatorTest is Test {
             1
         );
         vm.expectCall(
-            address(marketManager),
+            address(router),
             abi.encodeWithSignature(
-                "liquidatePosition(address,address,uint8,address)",
+                "pluginLiquidatePosition(address,address,uint8,address)",
                 MARKET,
                 ACCOUNT,
                 LONG,
@@ -146,9 +146,9 @@ contract LiquidatorTest is Test {
             1
         );
         vm.expectCall(
-            address(marketManager),
+            address(router),
             abi.encodeWithSignature(
-                "liquidatePosition(address,address,uint8,address)",
+                "pluginLiquidatePosition(address,address,uint8,address)",
                 MARKET,
                 ACCOUNT,
                 SHORT,
@@ -177,9 +177,9 @@ contract LiquidatorTest is Test {
             1
         );
         vm.expectCall(
-            address(marketManager),
+            address(router),
             abi.encodeWithSignature(
-                "liquidatePosition(address,address,uint8,address)",
+                "pluginLiquidatePosition(address,address,uint8,address)",
                 MARKET,
                 ACCOUNT,
                 SHORT,
@@ -312,9 +312,9 @@ contract LiquidatorTest is Test {
         vm.expectCall(address(efc), abi.encodeWithSignature("referrerTokens(address)", ACCOUNT), 1);
         vm.expectCall(address(marketManager), abi.encodeWithSignature("marketBaseConfigs(address)", MARKET), 1);
         vm.expectCall(
-            address(marketManager),
+            address(router),
             abi.encodeWithSignature(
-                "liquidatePosition(address,address,uint8,address)",
+                "pluginLiquidatePosition(address,address,uint8,address)",
                 MARKET,
                 ACCOUNT,
                 SHORT,

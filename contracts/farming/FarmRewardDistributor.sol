@@ -69,8 +69,9 @@ contract FarmRewardDistributor is Governable, ReentrancyGuard {
     /// @param _account The account that collect the reward for
     /// @param _nonceAndLockupPeriod The packed values of the nonce and lockup period: bit 0-31 represent the nonce,
     /// bit 32-47 represent the lockup period
-    /// @param _packedMarketRewardValues The packed values of the market index, reward type, and amount: bit 0-23 represent
-    /// the market index, bit 24-39 represent the reward type, bit 40-55 represent the referral token, and bit 56-255
+    /// @param _packedMarketRewardValues The packed values of the market index, reward type,
+    /// and amount: bit 0-23 represent the market index, bit 24-39 represent the reward type, bit 40-55 represent the
+    /// referral token, and bit 56-255
     /// represent the amount. If the referral token is non-zero, the account MUST be the owner of the referral token
     /// @param _signature The signature of the parameters to verify
     /// @param _receiver The address that received the reward
