@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run linter
 
 on:
     push:
@@ -27,5 +27,5 @@ jobs:
               run: npm ci
             - name: Try compiling
               run: npx hardhat compile
-            - name: Run tests
-              run: npx hardhat test
+            - name: Run linter
+              run: npx hardhat check

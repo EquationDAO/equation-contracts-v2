@@ -1,66 +1,65 @@
-## Foundry
+# Equation Contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+**Equation Contracts V2** is a collection of smart contracts for perpetual contracts.
 
-Foundry consists of:
+## Local Development
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+To compile the contracts locally, follow these steps:
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
+1. Clone the repository:
 
 ```shell
-$ forge build
+git clone git@github.com:EquationDAO/equation-contracts-v2.git
 ```
 
-### Test
+2. Install the required dependencies:
 
 ```shell
-$ forge test
+npm install
 ```
 
-### Format
+3. Install husky hooks:
 
 ```shell
-$ forge fmt
+npm run prepare
 ```
 
-### Gas Snapshots
+4. Compile the contracts:
 
 ```shell
-$ forge snapshot
+npm run build
 ```
 
-### Anvil
+## Deploy Contracts
+
+To deploy the contracts to a network and verify it, follow these steps:
+
+1. Create a `.env` file in the root directory of the project with the following contents:
 
 ```shell
-$ anvil
+# .env
+PRIVATE_KEY=your-private-key
+ARBISCAN_API_KEY=your-arbiscan-api-key
 ```
 
-### Deploy
+2. Run the deployment script:
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+sh ./scripts/deploy.sh -n <network-name> -c <chain-id> -d true -v true
+# Example: sh ./scripts/deploy.sh -n arbitrum-goerli -c 421613 -d true -v true
 ```
 
-### Cast
+3. View the deployed contracts in the `./deployments` directory.
 
-```shell
-$ cast <subcommand>
-```
+## License
 
-### Help
+The **Equation Contracts V2** project uses a variety of open-source licenses for its codebase. The licensing details for
+each portion of the project can be found in the individual source code files via the `SPDX-License-Identifier` header.
+Here is a summary of the licensing information for different parts of the project:
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+1. Code under the `./contracts/**/interfaces` directory is licensed under the GPL-2.0 license.
+2. Third-party code used in the project is subject to the following licenses:
+    - MIT License
+    - GPL-2.0 License
+3. Code under the `./contracts/test` directory is not licensed for use outside of the **Equation Contracts V2** project.
+4. All other code in the project is licensed under the BSL-1.1 license.
