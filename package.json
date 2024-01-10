@@ -1,0 +1,52 @@
+{
+    "name": "@equationdao/equation-contracts-v2",
+    "version": "0.0.1",
+    "author": "EquationDAO",
+    "license": "BUSL-1.1",
+    "description": "Equation DAO contracts v2",
+    "keywords": [
+        "equation",
+        "ethereum",
+        "arbitrum",
+        "DeFi"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:EquationDAO/equation-contracts-v2.git"
+    },
+    "files": [
+        "contracts/**/*.sol",
+        "!contracts/test/*",
+        "artifacts/contracts/**/*.json",
+        "!artifacts/contracts/test/**/*"
+    ],
+    "bugs": {
+        "url": "https://github.com/EquationDAO/equation-contracts-v2/issues"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npx hardhat check && npx prettier --write ."
+        }
+    },
+    "scripts": {
+        "prepare": "npx husky install",
+        "test": "npx hardhat test",
+        "foundry-test": "forge test",
+        "build": "npx hardhat compile"
+    },
+    "devDependencies": {
+        "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+        "@nomiclabs/hardhat-solhint": "^3.0.1",
+        "decimal.js": "^10.4.3",
+        "dotenv": "^16.3.1",
+        "hardhat": "^2.19.3",
+        "hardhat-contract-sizer": "^2.10.0",
+        "husky": "^8.0.3",
+        "mocha-chai-jest-snapshot": "^1.1.4",
+        "prettier": "^3.1.1",
+        "prettier-plugin-solidity": "^1.2.0"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^5.0.1"
+    }
+}

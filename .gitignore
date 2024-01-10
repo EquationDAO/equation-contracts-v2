@@ -1,0 +1,26 @@
+.idea
+.vscode
+.DS_Store
+
+node_modules
+.env
+
+# Hardhat files
+/cache
+/artifacts
+
+# TypeChain files
+/typechain
+/typechain-types
+
+# solidity-coverage files
+/coverage
+/coverage.json
+
+out
+foundry-out
+forge-cache
+
+ForkTest.t.sol
+
+deployments
