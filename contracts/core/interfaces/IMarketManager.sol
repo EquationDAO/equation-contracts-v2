@@ -161,7 +161,6 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
 
     /// @notice Emitted when the liquidity of the liquidation fund is increased by trading fee
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
-    /// @param liquidationFundFee The amount of the trading fee that is added to the liquidation fund
     /// @param liquidationFee The amount of the liquidation fee that is added to the liquidation fund.
     /// It consists of following parts:
     ///     1. The liquidation fee paid by the position
@@ -171,7 +170,6 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
     /// @param liquidationFundAfter The amount of the liquidation fund after the increase
     event GlobalLiquidationFundIncreasedByTradingFee(
         IMarketDescriptor indexed market,
-        uint128 liquidationFundFee,
         int256 liquidationFee,
         int256 liquidationFundAfter
     );

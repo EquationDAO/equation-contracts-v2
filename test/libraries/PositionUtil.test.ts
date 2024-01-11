@@ -198,15 +198,6 @@ describe("PositionUtil", () => {
                 priceFeed: mockPriceFeed,
             });
 
-            const tradingFee = await positionUtil.calculateTradingFee(
-                10n ** 18n,
-                toPriceX96("1808.235", DECIMALS_18, DECIMALS_6),
-                50_000n,
-            );
-            const liquidityFee = (tradingFee * 50_000_000n) / BASIS_POINTS_DIVISOR;
-            const protocolFee = (tradingFee * 30_000_000n) / BASIS_POINTS_DIVISOR;
-            const liquidationFundFee = tradingFee - liquidityFee - protocolFee;
-
             await expect(
                 positionUtil.distributeFee({
                     market: ETHMarketDescriptor.target,
@@ -224,7 +215,7 @@ describe("PositionUtil", () => {
                 }),
             )
                 .to.emit(_positionUtil.attach(positionUtil.target), "GlobalLiquidationFundIncreasedByTradingFee")
-                .withArgs(ETHMarketDescriptor.target, liquidationFundFee, 600_000n, liquidationFundFee + 600_000n);
+                .withArgs(ETHMarketDescriptor.target, 600_000n, 600_000n);
         });
 
         it("should increase global liquidity position PnL growth and emit GlobalLiquidityPositionPnLGrowthIncreasedByTradingFee event when trading fee and liquidation fee is positive", async () => {
@@ -244,7 +235,10 @@ describe("PositionUtil", () => {
                 toPriceX96("1808.235", DECIMALS_18, DECIMALS_6),
                 50_000n,
             );
-            const liquidityFee = (tradingFee * 50_000_000n) / BASIS_POINTS_DIVISOR;
+            const protocolFee = (tradingFee * 30_000_000n) / BASIS_POINTS_DIVISOR;
+            const referralFee = (tradingFee * 10_000_000n) / BASIS_POINTS_DIVISOR;
+            const referralParentFee = (tradingFee * 1_000_000n) / BASIS_POINTS_DIVISOR;
+            const liquidityFee = tradingFee - protocolFee - referralFee - referralParentFee;
 
             const globalLiquidityPosition = (await positionUtil.state()).globalLiquidityPosition;
             const unrealizedPnLGrowthAfterX64 =
@@ -261,8 +255,8 @@ describe("PositionUtil", () => {
                         tradingFeeRate: 50_000n,
                         referralReturnFeeRate: 10_000_000n,
                         referralParentReturnFeeRate: 1_000_000n,
-                        referralToken: 0n,
-                        referralParentToken: 0n,
+                        referralToken: 1n,
+                        referralParentToken: 2n,
                     },
                     liquidationFee: 600_000n,
                 }),

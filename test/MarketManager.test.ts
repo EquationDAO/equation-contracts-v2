@@ -169,7 +169,6 @@ describe("MarketManager", () => {
                 const {marketManager, ETHMarketDescriptor, marketCfg} = await loadFixture(deployFixture);
                 const marketFeeRateCfg = await marketManager.marketFeeRateConfigs(ETHMarketDescriptor.target);
                 expect(marketFeeRateCfg.tradingFeeRate).to.eq(marketCfg.feeRateConfig.tradingFeeRate);
-                expect(marketFeeRateCfg.liquidityFeeRate).to.eq(marketCfg.feeRateConfig.liquidityFeeRate);
                 expect(marketFeeRateCfg.protocolFeeRate).to.eq(marketCfg.feeRateConfig.protocolFeeRate);
                 expect(marketFeeRateCfg.referralReturnFeeRate).to.eq(marketCfg.feeRateConfig.referralReturnFeeRate);
                 expect(marketFeeRateCfg.referralParentReturnFeeRate).to.eq(
@@ -182,7 +181,6 @@ describe("MarketManager", () => {
                 const {marketManager, EQUMarketDescriptor} = await loadFixture(deployFixture);
                 const marketFeeRateCfg = await marketManager.marketFeeRateConfigs(EQUMarketDescriptor.target);
                 expect(marketFeeRateCfg.tradingFeeRate).to.eq(0n);
-                expect(marketFeeRateCfg.liquidityFeeRate).to.eq(0n);
                 expect(marketFeeRateCfg.protocolFeeRate).to.eq(0n);
                 expect(marketFeeRateCfg.referralReturnFeeRate).to.eq(0n);
                 expect(marketFeeRateCfg.referralParentReturnFeeRate).to.eq(0n);
@@ -438,15 +436,6 @@ describe("MarketManager", () => {
                         .withArgs(BASIS_POINTS_DIVISOR + 1n);
                 });
 
-                it("should revert if liquidity fee rate is greater than 100_000_000", async () => {
-                    const {marketManager, EQUMarketDescriptor} = await loadFixture(deployFixture);
-                    let marketCfg = newMarketConfig();
-                    marketCfg.feeRateConfig.liquidityFeeRate = BASIS_POINTS_DIVISOR + 1n;
-                    await expect(marketManager.enableMarket(EQUMarketDescriptor.target, marketCfg))
-                        .to.revertedWithCustomError(marketManager, "InvalidLiquidityFeeRate")
-                        .withArgs(BASIS_POINTS_DIVISOR + 1n);
-                });
-
                 it("should revert if protocol fee rate is greater than 100_000_000", async () => {
                     const {marketManager, EQUMarketDescriptor} = await loadFixture(deployFixture);
                     let marketCfg = newMarketConfig();
@@ -489,13 +478,11 @@ describe("MarketManager", () => {
                     marketCfg.feeRateConfig.referralParentReturnFeeRate =
                         BASIS_POINTS_DIVISOR +
                         1n -
-                        marketCfg.feeRateConfig.liquidityFeeRate -
                         marketCfg.feeRateConfig.protocolFeeRate -
                         marketCfg.feeRateConfig.referralReturnFeeRate;
                     await expect(marketManager.enableMarket(EQUMarketDescriptor.target, marketCfg))
                         .to.revertedWithCustomError(marketManager, "InvalidFeeRate")
                         .withArgs(
-                            marketCfg.feeRateConfig.liquidityFeeRate,
                             marketCfg.feeRateConfig.protocolFeeRate,
                             marketCfg.feeRateConfig.referralReturnFeeRate,
                             marketCfg.feeRateConfig.referralParentReturnFeeRate,
@@ -645,7 +632,6 @@ describe("MarketManager", () => {
                         },
                         (v: any) => {
                             expect(v.tradingFeeRate).to.eq(marketCfg.feeRateConfig.tradingFeeRate);
-                            expect(v.liquidityFeeRate).to.eq(marketCfg.feeRateConfig.liquidityFeeRate);
                             expect(v.protocolFeeRate).to.eq(marketCfg.feeRateConfig.protocolFeeRate);
                             expect(v.referralReturnFeeRate).to.eq(marketCfg.feeRateConfig.referralReturnFeeRate);
                             expect(v.referralParentReturnFeeRate).to.eq(
@@ -869,15 +855,6 @@ describe("MarketManager", () => {
                     .withArgs(BASIS_POINTS_DIVISOR + 1n);
             });
 
-            it("should revert if liquidity fee rate is greater than 100_000_000", async () => {
-                const {marketManager, ETHMarketDescriptor} = await loadFixture(deployFixture);
-                let feeRateConfig = newMarketFeeRateConfig();
-                feeRateConfig.liquidityFeeRate = BASIS_POINTS_DIVISOR + 1n;
-                await expect(marketManager.updateMarketFeeRateConfig(ETHMarketDescriptor.target, feeRateConfig))
-                    .to.revertedWithCustomError(marketManager, "InvalidLiquidityFeeRate")
-                    .withArgs(BASIS_POINTS_DIVISOR + 1n);
-            });
-
             it("should revert if protocol fee rate is greater than 100_000_000", async () => {
                 const {marketManager, ETHMarketDescriptor} = await loadFixture(deployFixture);
                 let feeRateConfig = newMarketFeeRateConfig();
@@ -918,15 +895,10 @@ describe("MarketManager", () => {
                 const {marketManager, ETHMarketDescriptor} = await loadFixture(deployFixture);
                 let feeRateConfig = newMarketFeeRateConfig();
                 feeRateConfig.referralParentReturnFeeRate =
-                    BASIS_POINTS_DIVISOR +
-                    1n -
-                    feeRateConfig.liquidityFeeRate -
-                    feeRateConfig.protocolFeeRate -
-                    feeRateConfig.referralReturnFeeRate;
+                    BASIS_POINTS_DIVISOR + 1n - feeRateConfig.protocolFeeRate - feeRateConfig.referralReturnFeeRate;
                 await expect(marketManager.updateMarketFeeRateConfig(ETHMarketDescriptor.target, feeRateConfig))
                     .to.revertedWithCustomError(marketManager, "InvalidFeeRate")
                     .withArgs(
-                        feeRateConfig.liquidityFeeRate,
                         feeRateConfig.protocolFeeRate,
                         feeRateConfig.referralReturnFeeRate,
                         feeRateConfig.referralParentReturnFeeRate,
@@ -940,7 +912,6 @@ describe("MarketManager", () => {
                     .to.emit(marketManager, "MarketFeeRateConfigChanged")
                     .withArgs(ETHMarketDescriptor.target, (v: any) => {
                         expect(v.tradingFeeRate).to.eq(feeRateConfig.tradingFeeRate);
-                        expect(v.liquidityFeeRate).to.eq(feeRateConfig.liquidityFeeRate);
                         expect(v.protocolFeeRate).to.eq(feeRateConfig.protocolFeeRate);
                         expect(v.referralReturnFeeRate).to.eq(feeRateConfig.referralReturnFeeRate);
                         expect(v.referralParentReturnFeeRate).to.eq(feeRateConfig.referralParentReturnFeeRate);
@@ -1152,7 +1123,9 @@ describe("MarketManager", () => {
                 expect(globalLiquidityPosition.previousSPPriceX96).to.gt(0n);
                 expect(globalLiquidityPosition.side).to.eq(SIDE_SHORT);
                 expect(globalLiquidityPosition.liquidity).to.eq(marketCfg.baseConfig.minMarginPerLiquidityPosition);
-                expect(globalLiquidityPosition.unrealizedPnLGrowthX64).to.eq(0n);
+                expect(globalLiquidityPosition.unrealizedPnLGrowthX64).to.eq(
+                    (1n * (1n << 64n)) / marketCfg.baseConfig.minMarginPerLiquidityPosition,
+                );
             });
         });
 

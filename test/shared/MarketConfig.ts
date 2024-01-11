@@ -20,7 +20,6 @@ export function newMarketBaseConfig() {
 export function newMarketFeeRateConfig() {
     return {
         tradingFeeRate: 50_000n, // 0.05%
-        liquidityFeeRate: 50_000_000n, // 50%
         protocolFeeRate: 30_000_000n, // 30%
         referralReturnFeeRate: 10_000_000n, // 10%
         referralParentReturnFeeRate: 1_000_000n, // 1%

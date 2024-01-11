@@ -106,7 +106,7 @@ contract ConfigurableTest is Test {
         configurable.updateMarketPriceConfig(IMarketDescriptor(address(1)), cfg);
     }
 
-    function _buildDefaultMarketConfig() private returns (IConfigurable.MarketConfig memory) {
+    function _buildDefaultMarketConfig() private pure returns (IConfigurable.MarketConfig memory) {
         return
             IConfigurable.MarketConfig({
                 baseConfig: IConfigurable.MarketBaseConfig({
@@ -125,7 +125,6 @@ contract ConfigurableTest is Test {
                 }),
                 feeRateConfig: IConfigurable.MarketFeeRateConfig({
                     tradingFeeRate: 0.0005 * 1e8,
-                    liquidityFeeRate: 0.4 * 1e8,
                     protocolFeeRate: 0.4 * 1e8,
                     referralReturnFeeRate: 0.1 * 1e8,
                     referralParentReturnFeeRate: 0.01 * 1e8,

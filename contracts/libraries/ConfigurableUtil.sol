@@ -102,9 +102,6 @@ library ConfigurableUtil {
         if (_newCfg.tradingFeeRate > Constants.BASIS_POINTS_DIVISOR)
             revert IConfigurable.InvalidTradingFeeRate(_newCfg.tradingFeeRate);
 
-        if (_newCfg.liquidityFeeRate > Constants.BASIS_POINTS_DIVISOR)
-            revert IConfigurable.InvalidLiquidityFeeRate(_newCfg.liquidityFeeRate);
-
         if (_newCfg.protocolFeeRate > Constants.BASIS_POINTS_DIVISOR)
             revert IConfigurable.InvalidProtocolFeeRate(_newCfg.protocolFeeRate);
 
@@ -118,14 +115,10 @@ library ConfigurableUtil {
             revert IConfigurable.InvalidReferralDiscountRate(_newCfg.referralDiscountRate);
 
         if (
-            uint256(_newCfg.liquidityFeeRate) +
-                _newCfg.protocolFeeRate +
-                _newCfg.referralReturnFeeRate +
-                _newCfg.referralParentReturnFeeRate >
+            uint256(_newCfg.protocolFeeRate) + _newCfg.referralReturnFeeRate + _newCfg.referralParentReturnFeeRate >
             Constants.BASIS_POINTS_DIVISOR
         )
             revert IConfigurable.InvalidFeeRate(
-                _newCfg.liquidityFeeRate,
                 _newCfg.protocolFeeRate,
                 _newCfg.referralReturnFeeRate,
                 _newCfg.referralParentReturnFeeRate

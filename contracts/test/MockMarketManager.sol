@@ -62,7 +62,7 @@ contract MockMarketManager {
     ) external {}
 
     function setMarketFeeRateConfig(IMarketDescriptor /*_market*/) external {
-        marketFeeRateConfig = IConfigurable.MarketFeeRateConfig(0, 0, 0, 0, 0, 0);
+        marketFeeRateConfig = IConfigurable.MarketFeeRateConfig(0, 0, 0, 0, 0);
     }
 
     function marketFeeRateConfigs(

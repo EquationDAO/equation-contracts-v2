@@ -532,19 +532,15 @@ library PositionUtil {
         DistributeFeeParameter memory _parameter
     ) internal returns (uint128 tradingFee) {
         uint128 liquidityFee;
-        uint128 liquidationFundFee;
-        (tradingFee, liquidityFee, liquidationFundFee) = _calculateFee(_state, _feeRateCfg, _parameter);
+        (tradingFee, liquidityFee) = _calculateFee(_state, _feeRateCfg, _parameter);
 
         if (tradingFee == 0 && _parameter.liquidationFee == 0) return 0;
 
         IMarketManager.GlobalLiquidationFund storage globalLiquidationFund = _state.globalLiquidationFund;
-        int256 liquidationFundAfter = globalLiquidationFund.liquidationFund +
-            int256(uint256(liquidationFundFee)) +
-            _parameter.liquidationFee;
+        int256 liquidationFundAfter = globalLiquidationFund.liquidationFund + _parameter.liquidationFee;
         globalLiquidationFund.liquidationFund = liquidationFundAfter;
         emit IMarketManager.GlobalLiquidationFundIncreasedByTradingFee(
             _parameter.market,
-            liquidationFundFee,
             _parameter.liquidationFee,
             liquidationFundAfter
         );
@@ -794,7 +790,7 @@ library PositionUtil {
         IMarketManager.State storage _state,
         IConfigurable.MarketFeeRateConfig storage _feeRateCfg,
         DistributeFeeParameter memory _parameter
-    ) private returns (uint128 tradingFee, uint128 liquidityFee, uint128 liquidationFundFee) {
+    ) private returns (uint128 tradingFee, uint128 liquidityFee) {
         unchecked {
             tradingFee = calculateTradingFee(
                 _parameter.sizeDelta,
@@ -802,15 +798,13 @@ library PositionUtil {
                 _parameter.tradingFeeState.tradingFeeRate
             );
 
-            if (tradingFee == 0) return (0, 0, 0);
-
-            liquidityFee = _splitFee(tradingFee, _feeRateCfg.liquidityFeeRate);
+            if (tradingFee == 0) return (0, 0);
 
             uint128 _protocolFee = _splitFee(tradingFee, _feeRateCfg.protocolFeeRate);
             _state.protocolFee += _protocolFee; // overflow is desired
             emit IMarketManager.ProtocolFeeIncreased(_parameter.market, _protocolFee);
 
-            liquidationFundFee = tradingFee - liquidityFee - _protocolFee;
+            liquidityFee = tradingFee - _protocolFee;
 
             if (_parameter.tradingFeeState.referralToken > 0) {
                 uint128 referralFee = _splitFee(tradingFee, _parameter.tradingFeeState.referralReturnFeeRate);
@@ -832,7 +826,7 @@ library PositionUtil {
                     referralParentFee
                 );
 
-                liquidationFundFee -= referralFee + referralParentFee;
+                liquidityFee -= (referralFee + referralParentFee);
             }
         }
     }
