@@ -171,17 +171,17 @@ interface IMarketPosition {
         address feeReceiver
     );
 
-    /// @notice Get the global position
+    /// @notice Get the global position of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     function globalPositions(IMarketDescriptor market) external view returns (GlobalPosition memory);
 
-    /// @notice Get the previous global funding rate growth
+    /// @notice Get the previous global funding rate growth of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     function previousGlobalFundingRates(
         IMarketDescriptor market
     ) external view returns (PreviousGlobalFundingRate memory);
 
-    /// @notice Get the global funding rate sample
+    /// @notice Get the global funding rate sample of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     function globalFundingRateSamples(IMarketDescriptor market) external view returns (GlobalFundingRateSample memory);
 

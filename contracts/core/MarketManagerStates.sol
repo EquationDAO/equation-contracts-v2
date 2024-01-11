@@ -24,6 +24,26 @@ abstract contract MarketManagerStates is IMarketManager, Configurable {
         reentrancyStatus[_market] = NOT_ENTERED;
     }
 
+    /// @inheritdoc IMarketManager
+    function priceStates(IMarketDescriptor _market) external view override returns (PriceState memory) {
+        return marketStates[_market].priceState;
+    }
+
+    /// @inheritdoc IMarketManager
+    function usdBalances(IMarketDescriptor _market) external view override returns (uint256) {
+        return marketStates[_market].usdBalance;
+    }
+
+    /// @inheritdoc IMarketManager
+    function protocolFees(IMarketDescriptor _market) external view override returns (uint128) {
+        return marketStates[_market].protocolFee;
+    }
+
+    /// @inheritdoc IMarketManager
+    function referralFees(IMarketDescriptor _market, uint256 _referralToken) external view override returns (uint256) {
+        return marketStates[_market].referralFees[_referralToken];
+    }
+
     /// @inheritdoc IMarketLiquidityPosition
     function globalLiquidityPositions(
         IMarketDescriptor _market
@@ -70,18 +90,18 @@ abstract contract MarketManagerStates is IMarketManager, Configurable {
     }
 
     /// @inheritdoc IMarketManager
-    function priceStates(IMarketDescriptor _market) external view override returns (PriceState memory) {
-        return marketStates[_market].priceState;
+    function globalLiquidationFunds(
+        IMarketDescriptor _market
+    ) external view override returns (IMarketManager.GlobalLiquidationFund memory) {
+        return marketStates[_market].globalLiquidationFund;
     }
 
     /// @inheritdoc IMarketManager
-    function protocolFees(IMarketDescriptor _market) external view override returns (uint128) {
-        return marketStates[_market].protocolFee;
-    }
-
-    /// @inheritdoc IMarketManager
-    function referralFees(IMarketDescriptor _market, uint256 _referralToken) external view override returns (uint256) {
-        return marketStates[_market].referralFees[_referralToken];
+    function liquidationFundPositions(
+        IMarketDescriptor _market,
+        address _account
+    ) external view override returns (uint256) {
+        return marketStates[_market].liquidationFundPositions[_account];
     }
 
     /// @inheritdoc IMarketManager
@@ -97,20 +117,5 @@ abstract contract MarketManagerStates is IMarketManager, Configurable {
             state.priceState.basisIndexPriceX96,
             state.priceState.premiumRateX96
         );
-    }
-
-    /// @inheritdoc IMarketManager
-    function globalLiquidationFunds(
-        IMarketDescriptor _market
-    ) external view override returns (IMarketManager.GlobalLiquidationFund memory) {
-        return marketStates[_market].globalLiquidationFund;
-    }
-
-    /// @inheritdoc IMarketManager
-    function liquidationFundPositions(
-        IMarketDescriptor _market,
-        address _account
-    ) external view override returns (uint256) {
-        return marketStates[_market].liquidationFundPositions[_account];
     }
 }
