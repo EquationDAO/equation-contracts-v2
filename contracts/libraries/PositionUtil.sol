@@ -536,14 +536,16 @@ library PositionUtil {
 
         if (tradingFee == 0 && _parameter.liquidationFee == 0) return 0;
 
-        IMarketManager.GlobalLiquidationFund storage globalLiquidationFund = _state.globalLiquidationFund;
-        int256 liquidationFundAfter = globalLiquidationFund.liquidationFund + _parameter.liquidationFee;
-        globalLiquidationFund.liquidationFund = liquidationFundAfter;
-        emit IMarketManager.GlobalLiquidationFundIncreasedByTradingFee(
-            _parameter.market,
-            _parameter.liquidationFee,
-            liquidationFundAfter
-        );
+        if (_parameter.liquidationFee != 0) {
+            IMarketManager.GlobalLiquidationFund storage globalLiquidationFund = _state.globalLiquidationFund;
+            int256 liquidationFundAfter = globalLiquidationFund.liquidationFund + _parameter.liquidationFee;
+            globalLiquidationFund.liquidationFund = liquidationFundAfter;
+            emit IMarketManager.GlobalLiquidationFundIncreasedByLiquidation(
+                _parameter.market,
+                _parameter.liquidationFee,
+                liquidationFundAfter
+            );
+        }
 
         IMarketManager.GlobalLiquidityPosition storage position = _state.globalLiquidityPosition;
         int256 unrealizedPnLGrowthAfterX64 = position.unrealizedPnLGrowthX64 +

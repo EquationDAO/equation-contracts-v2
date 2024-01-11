@@ -34,15 +34,15 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
         /// @notice The liquidation fund, primarily used to compensate for the difference between the
         /// liquidation price and the index price when a trader's position is liquidated. It consists of
         /// the following parts:
-        ///     1. Increased by the trader's trading fee
-        ///     2. Increased by the liquidation fee when the trader's is liquidated
-        ///     3. Increased by the liquidation fee when the LP's position is liquidated
-        ///     4. Increased by the liquidity added to the liquidation fund
-        ///     5. Decreased by the liquidity removed from the liquidation fund
-        ///     6. Decreased by the funding fee compensated when the trader's position is liquidated
-        ///     7. Decreased by the loss compensated when the LP's position is liquidated
-        ///     8. Decreased by the difference between the liquidation price and the index price when
+        ///     1. Increased by the liquidation fee when the trader's is liquidated
+        ///     2. Increased by the liquidation fee when the LP's position is liquidated
+        ///     3. Increased by the liquidity added to the liquidation fund
+        ///     4. Decreased by the liquidity removed from the liquidation fund
+        ///     5. Decreased by the funding fee compensated when the trader's position is liquidated
+        ///     6. Decreased by the loss compensated when the LP's position is liquidated
+        ///     7. Decreased by the difference between the liquidation price and the index price when
         ///      the trader's position is liquidated
+        ///     8. Decreased by the governance when the liquidation fund is pofitable
         int256 liquidationFund;
         /// @notice The total liquidity of the liquidation fund
         uint256 liquidity;
@@ -159,7 +159,7 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
         uint128 liquidationFundDelta
     );
 
-    /// @notice Emitted when the liquidity of the liquidation fund is increased by trading fee
+    /// @notice Emitted when the liquidity of the liquidation fund is increased by liquidation
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     /// @param liquidationFee The amount of the liquidation fee that is added to the liquidation fund.
     /// It consists of following parts:
@@ -168,7 +168,7 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
     ///     3. The difference between the liquidation price and the trade price when liquidating,
     ///     covered by the liquidation fund (if any)
     /// @param liquidationFundAfter The amount of the liquidation fund after the increase
-    event GlobalLiquidationFundIncreasedByTradingFee(
+    event GlobalLiquidationFundIncreasedByLiquidation(
         IMarketDescriptor indexed market,
         int256 liquidationFee,
         int256 liquidationFundAfter

@@ -186,7 +186,7 @@ describe("PositionUtil", () => {
                 .withArgs(ETHMarketDescriptor.target, account.address, 10001n, referralFee, 1001n, referralParentFee);
         });
 
-        it("should increase liquidation fund and emit GlobalLiquidationFundIncreasedByTradingFee event when trading fee and liquidation fee is positive", async () => {
+        it("should increase liquidation fund and emit GlobalLiquidationFundIncreasedByLiquidation event when trading fee and liquidation fee is positive", async () => {
             const {positionUtil, _positionUtil, ETHMarketDescriptor, account, marketCfg, mockPriceFeed} =
                 await loadFixture(deployFixture);
 
@@ -214,7 +214,7 @@ describe("PositionUtil", () => {
                     liquidationFee: 600_000n,
                 }),
             )
-                .to.emit(_positionUtil.attach(positionUtil.target), "GlobalLiquidationFundIncreasedByTradingFee")
+                .to.emit(_positionUtil.attach(positionUtil.target), "GlobalLiquidationFundIncreasedByLiquidation")
                 .withArgs(ETHMarketDescriptor.target, 600_000n, 600_000n);
         });
 
@@ -1198,11 +1198,11 @@ describe("PositionUtil", () => {
             await assertion.to.emit(_positionUtil.attach(positionUtil.target), "ProtocolFeeIncreased");
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),
-                "GlobalLiquidationFundIncreasedByTradingFee",
-            );
-            await assertion.to.emit(
-                _positionUtil.attach(positionUtil.target),
                 "GlobalLiquidityPositionPnLGrowthIncreasedByTradingFee",
+            );
+            await assertion.to.not.emit(
+                _positionUtil.attach(positionUtil.target),
+                "GlobalLiquidationFundIncreasedByLiquidation",
             );
         });
 
@@ -1798,11 +1798,11 @@ describe("PositionUtil", () => {
             );
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),
-                "GlobalLiquidationFundIncreasedByTradingFee",
-            );
-            await assertion.to.emit(
-                _positionUtil.attach(positionUtil.target),
                 "GlobalLiquidityPositionPnLGrowthIncreasedByTradingFee",
+            );
+            await assertion.to.not.emit(
+                _positionUtil.attach(positionUtil.target),
+                "GlobalLiquidationFundIncreasedByLiquidation",
             );
         });
 
@@ -2357,7 +2357,7 @@ describe("PositionUtil", () => {
             await assertion.to.emit(_positionUtil.attach(positionUtil.target), "ProtocolFeeIncreased");
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),
-                "GlobalLiquidationFundIncreasedByTradingFee",
+                "GlobalLiquidationFundIncreasedByLiquidation",
             );
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),
