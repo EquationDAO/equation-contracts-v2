@@ -142,7 +142,7 @@ interface IMarketLiquidityPosition {
         int256 unrealizedPnLGrowthAfterX64
     );
 
-    /// @notice Get the global liquidity position
+    /// @notice Get the global liquidity position of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     function globalLiquidityPositions(IMarketDescriptor market) external view returns (GlobalLiquidityPosition memory);
 

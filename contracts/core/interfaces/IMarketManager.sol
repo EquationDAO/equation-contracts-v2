@@ -202,42 +202,39 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
     /// @param priceFeed The address of the new price feed
     function setPriceFeed(IPriceFeed priceFeed) external;
 
-    /// @notice Sample and adjust the funding rate
+    /// @notice Sample and adjust the funding rate of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     function sampleAndAdjustFundingRate(IMarketDescriptor market) external;
 
-    /// @notice Get the price state
+    /// @notice Get the price state of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     function priceStates(IMarketDescriptor market) external view returns (PriceState memory);
 
-    /// @notice Get the market price
+    /// @notice Get the USD balance of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
-    /// @param side The side of the position adjustment, 1 for opening long or closing short positions,
-    /// 2 for opening short or closing long positions
-    /// @return marketPriceX96 The market price, as a Q64.96
-    function marketPriceX96s(IMarketDescriptor market, Side side) external view returns (uint160 marketPriceX96);
+    function usdBalances(IMarketDescriptor market) external view returns (uint256);
 
-    /// @notice Change the price vertex
+    /// @notice Get the protocol fee of the given market
+    /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
+    function protocolFees(IMarketDescriptor market) external view returns (uint128);
+
+    /// @notice Change the price vertex of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     /// @param startExclusive The start index of the price vertex to be changed, exclusive
     /// @param endInclusive The end index of the price vertex to be changed, inclusive
     function changePriceVertex(IMarketDescriptor market, uint8 startExclusive, uint8 endInclusive) external;
 
-    /// @notice Get the protocol fee
-    /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
-    function protocolFees(IMarketDescriptor market) external view returns (uint128);
-
-    /// @notice Collect the protocol fee
+    /// @notice Collect the protocol fee of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     /// @dev This function can be called without authorization
     function collectProtocolFee(IMarketDescriptor market) external;
 
-    /// @notice Get the referral fee
+    /// @notice Get the referral fee of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     /// @param referralToken The id of the referral token
     function referralFees(IMarketDescriptor market, uint256 referralToken) external view returns (uint256);
 
-    /// @notice Collect the referral fee
+    /// @notice Collect the referral fee of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     /// @param referralToken The id of the referral token
     /// @param receiver The address to receive the referral fee
@@ -248,7 +245,7 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
         address receiver
     ) external returns (uint256);
 
-    /// @notice Get the global liquidation fund
+    /// @notice Get the global liquidation fund of the given market
     /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
     function globalLiquidationFunds(IMarketDescriptor market) external view returns (GlobalLiquidationFund memory);
 
@@ -289,4 +286,11 @@ interface IMarketManager is IMarketErrors, IMarketPosition, IMarketLiquidityPosi
         uint128 liquidityDelta,
         address receiver
     ) external;
+
+    /// @notice Get the market price of the given market
+    /// @param market The descriptor used to describe the metadata of the market, such as symbol, name, decimals
+    /// @param side The side of the position adjustment, 1 for opening long or closing short positions,
+    /// 2 for opening short or closing long positions
+    /// @return marketPriceX96 The market price, as a Q64.96
+    function marketPriceX96s(IMarketDescriptor market, Side side) external view returns (uint160 marketPriceX96);
 }
