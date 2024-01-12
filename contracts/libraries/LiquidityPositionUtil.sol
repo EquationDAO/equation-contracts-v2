@@ -192,7 +192,7 @@ library LiquidityPositionUtil {
             _parameter.account,
             msg.sender,
             marginAfter,
-            globalLiquidityPosition.unrealizedPnLGrowthX64,
+            unrealizedPnLGrowthAfterX64,
             _parameter.feeReceiver
         );
     }
