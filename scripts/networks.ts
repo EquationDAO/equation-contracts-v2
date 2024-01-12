@@ -18,8 +18,7 @@ const defaultBaseCfg = {
 
 const defaultFeeRateCfg = {
     tradingFeeRate: parsePercent("0.02%"),
-    liquidityFeeRate: parsePercent("16%"),
-    protocolFeeRate: parsePercent("50%"),
+    protocolFeeRate: parsePercent("40%"),
     referralReturnFeeRate: parsePercent("10%"),
     referralParentReturnFeeRate: parsePercent("1%"),
     referralDiscountRate: parsePercent("50%"),

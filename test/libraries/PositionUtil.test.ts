@@ -186,7 +186,7 @@ describe("PositionUtil", () => {
                 .withArgs(ETHMarketDescriptor.target, account.address, 10001n, referralFee, 1001n, referralParentFee);
         });
 
-        it("should increase liquidation fund and emit GlobalLiquidationFundIncreasedByTradingFee event when trading fee and liquidation fee is positive", async () => {
+        it("should increase liquidation fund and emit GlobalLiquidationFundIncreasedByLiquidation event when trading fee and liquidation fee is positive", async () => {
             const {positionUtil, _positionUtil, ETHMarketDescriptor, account, marketCfg, mockPriceFeed} =
                 await loadFixture(deployFixture);
 
@@ -197,15 +197,6 @@ describe("PositionUtil", () => {
                 liquidityDelta: marketCfg.baseConfig.minMarginPerLiquidityPosition * 1000n,
                 priceFeed: mockPriceFeed,
             });
-
-            const tradingFee = await positionUtil.calculateTradingFee(
-                10n ** 18n,
-                toPriceX96("1808.235", DECIMALS_18, DECIMALS_6),
-                50_000n,
-            );
-            const liquidityFee = (tradingFee * 50_000_000n) / BASIS_POINTS_DIVISOR;
-            const protocolFee = (tradingFee * 30_000_000n) / BASIS_POINTS_DIVISOR;
-            const liquidationFundFee = tradingFee - liquidityFee - protocolFee;
 
             await expect(
                 positionUtil.distributeFee({
@@ -223,8 +214,8 @@ describe("PositionUtil", () => {
                     liquidationFee: 600_000n,
                 }),
             )
-                .to.emit(_positionUtil.attach(positionUtil.target), "GlobalLiquidationFundIncreasedByTradingFee")
-                .withArgs(ETHMarketDescriptor.target, liquidationFundFee, 600_000n, liquidationFundFee + 600_000n);
+                .to.emit(_positionUtil.attach(positionUtil.target), "GlobalLiquidationFundIncreasedByLiquidation")
+                .withArgs(ETHMarketDescriptor.target, 600_000n, 600_000n);
         });
 
         it("should increase global liquidity position PnL growth and emit GlobalLiquidityPositionPnLGrowthIncreasedByTradingFee event when trading fee and liquidation fee is positive", async () => {
@@ -244,7 +235,10 @@ describe("PositionUtil", () => {
                 toPriceX96("1808.235", DECIMALS_18, DECIMALS_6),
                 50_000n,
             );
-            const liquidityFee = (tradingFee * 50_000_000n) / BASIS_POINTS_DIVISOR;
+            const protocolFee = (tradingFee * 30_000_000n) / BASIS_POINTS_DIVISOR;
+            const referralFee = (tradingFee * 10_000_000n) / BASIS_POINTS_DIVISOR;
+            const referralParentFee = (tradingFee * 1_000_000n) / BASIS_POINTS_DIVISOR;
+            const liquidityFee = tradingFee - protocolFee - referralFee - referralParentFee;
 
             const globalLiquidityPosition = (await positionUtil.state()).globalLiquidityPosition;
             const unrealizedPnLGrowthAfterX64 =
@@ -261,8 +255,8 @@ describe("PositionUtil", () => {
                         tradingFeeRate: 50_000n,
                         referralReturnFeeRate: 10_000_000n,
                         referralParentReturnFeeRate: 1_000_000n,
-                        referralToken: 0n,
-                        referralParentToken: 0n,
+                        referralToken: 1n,
+                        referralParentToken: 2n,
                     },
                     liquidationFee: 600_000n,
                 }),
@@ -1204,11 +1198,11 @@ describe("PositionUtil", () => {
             await assertion.to.emit(_positionUtil.attach(positionUtil.target), "ProtocolFeeIncreased");
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),
-                "GlobalLiquidationFundIncreasedByTradingFee",
-            );
-            await assertion.to.emit(
-                _positionUtil.attach(positionUtil.target),
                 "GlobalLiquidityPositionPnLGrowthIncreasedByTradingFee",
+            );
+            await assertion.to.not.emit(
+                _positionUtil.attach(positionUtil.target),
+                "GlobalLiquidationFundIncreasedByLiquidation",
             );
         });
 
@@ -1804,11 +1798,11 @@ describe("PositionUtil", () => {
             );
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),
-                "GlobalLiquidationFundIncreasedByTradingFee",
-            );
-            await assertion.to.emit(
-                _positionUtil.attach(positionUtil.target),
                 "GlobalLiquidityPositionPnLGrowthIncreasedByTradingFee",
+            );
+            await assertion.to.not.emit(
+                _positionUtil.attach(positionUtil.target),
+                "GlobalLiquidationFundIncreasedByLiquidation",
             );
         });
 
@@ -2363,7 +2357,7 @@ describe("PositionUtil", () => {
             await assertion.to.emit(_positionUtil.attach(positionUtil.target), "ProtocolFeeIncreased");
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),
-                "GlobalLiquidationFundIncreasedByTradingFee",
+                "GlobalLiquidationFundIncreasedByLiquidation",
             );
             await assertion.to.emit(
                 _positionUtil.attach(positionUtil.target),

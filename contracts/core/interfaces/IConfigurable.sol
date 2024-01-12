@@ -60,9 +60,6 @@ interface IConfigurable {
         /// @notice The trading fee rate for trader increase or decrease positions,
         /// denominated in ten thousandths of a bip (i.e. 1e-8)
         uint32 tradingFeeRate;
-        /// @notice The liquidity fee rate as a percentage of trading fee,
-        /// denominated in ten thousandths of a bip (i.e. 1e-8)
-        uint32 liquidityFeeRate;
         /// @notice The protocol fee rate as a percentage of trading fee,
         /// denominated in ten thousandths of a bip (i.e. 1e-8)
         uint32 protocolFeeRate;
@@ -148,8 +145,6 @@ interface IConfigurable {
     error InvalidMaxFundingRate(uint32 maxFundingRate);
     /// @notice Invalid trading fee rate
     error InvalidTradingFeeRate(uint32 tradingFeeRate);
-    /// @notice Invalid liquidity fee rate
-    error InvalidLiquidityFeeRate(uint32 liquidityFeeRate);
     /// @notice Invalid protocol fee rate
     error InvalidProtocolFeeRate(uint32 protocolFeeRate);
     /// @notice Invalid referral return fee rate
@@ -159,12 +154,7 @@ interface IConfigurable {
     /// @notice Invalid referral discount rate
     error InvalidReferralDiscountRate(uint32 referralDiscountRate);
     /// @notice Invalid fee rate
-    error InvalidFeeRate(
-        uint32 liquidityFeeRate,
-        uint32 protocolFeeRate,
-        uint32 referralReturnFeeRate,
-        uint32 referralParentReturnFeeRate
-    );
+    error InvalidFeeRate(uint32 protocolFeeRate, uint32 referralReturnFeeRate, uint32 referralParentReturnFeeRate);
     /// @notice Invalid maximum price impact liquidity
     error InvalidMaxPriceImpactLiquidity(uint128 maxPriceImpactLiquidity);
     /// @notice Invalid vertices length
