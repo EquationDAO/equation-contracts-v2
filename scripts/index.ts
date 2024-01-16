@@ -205,9 +205,9 @@ async function main() {
             marketDescriptorInitCodeHash,
         );
         await marketManager.enableMarket(marketAddr, {
-            baseConfig: item.baseCfg,
-            feeRateConfig: item.feeRateCfg,
-            priceConfig: item.priceCfg,
+            baseConfig: item.marketCfg.baseCfg,
+            feeRateConfig: item.marketCfg.feeRateCfg,
+            priceConfig: item.marketCfg.priceCfg,
         });
         await marketIndexer.assignMarketIndex(marketAddr);
         if (item.chainLinkPriceFeed != undefined) {
