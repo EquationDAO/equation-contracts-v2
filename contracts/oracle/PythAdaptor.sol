@@ -26,16 +26,14 @@ contract PythAdaptor is IPythAdaptor, Governable {
     /// @notice The current index of the asset assigned
     uint256 public assetIndex;
 
-    // @notice each price and each publish time diff will occupy 24 bits.
-    // uint256 will be able to contain 5 (5 * (24 + 24) = 240 bits) entries
-    uint8 public constant MAX_PRICE_PER_WORD = 5;
+    // @notice each price and each publish time diff will occupy 24 bits. price asset index will occupy 16 bits.
+    // uint256 will be able to contain 4 (4 * (24 + 24 + 16) = 256 bits) entries
+    uint8 public constant MAX_PRICE_PER_WORD = 4;
 
     modifier onlyUpdater() {
         if (!updaters[msg.sender]) revert Forbidden();
         _;
     }
-
-    constructor() {}
 
     /// @inheritdoc IPythAdaptor
     function updatePriceFeeds(
@@ -43,19 +41,15 @@ contract PythAdaptor is IPythAdaptor, Governable {
         uint256 _minPublishTime,
         bytes32 _encodedVaas
     ) external onlyUpdater {
-        uint packedValueLen = _prices.length;
+        uint256 packedValueLen = _prices.length;
         uint256 maxAssetsIndex = assetIndex;
-        for (uint i; i < packedValueLen; i++) {
+        for (uint256 i; i < packedValueLen; ++i) {
             PackedValue price = _prices[i];
-            uint8 outerIndex = price.unpackUint8(0);
-            uint8 indexIndexBitMap = price.unpackUint8(8);
-            for (uint8 j = 0; j < MAX_PRICE_PER_WORD; j++) {
-                if ((uint256(0x01) << j) & indexIndexBitMap == 0) {
-                    continue;
-                }
-                int24 priceTick = int24(price.unpackUint24(j * 48 + 16));
-                uint24 pricePublishTimeDiff = price.unpackUint24(j * 48 + 40);
-                uint8 assetIdIndex = outerIndex * MAX_PRICE_PER_WORD + j + 1;
+            for (uint8 j; j < MAX_PRICE_PER_WORD; ++j) {
+                uint16 assetIdIndex = price.unpackUint16(j * 64);
+                if (assetIndex == 0) break;
+                int24 priceTick = int24(price.unpackUint24(j * 64 + 16));
+                uint24 pricePublishTimeDiff = price.unpackUint24(j * 64 + 40);
                 if (assetIdIndex > maxAssetsIndex) revert InvalidAssetIndex(assetIdIndex);
                 bytes32 assetId = indexAssets[assetIdIndex];
                 priceData[assetId] = CompressedPrice({
@@ -116,15 +110,5 @@ contract PythAdaptor is IPythAdaptor, Governable {
             indexAssets[index] = asset;
             emit AssetIndexAssigned(asset, index);
         }
-    }
-
-    /// @inheritdoc IPythAdaptor
-    function reassignAssetIndex(uint256 _index, bytes32 _asset) external onlyGov {
-        if (_index == 0 || _index > assetIndex || assetsIndexes[_asset] != 0)
-            revert InvalidReassignAssetIndexArgs(_asset, _index);
-        assetsIndexes[_asset] = _index;
-        indexAssets[_index] = _asset;
-        clearPrices();
-        emit AssetIndexAssigned(_asset, _index);
     }
 }

@@ -48,19 +48,18 @@ describe("PythAdaptor", () => {
         }
         let encodedData = new Map();
         for (let i = 0; i < priceData.length; i++) {
-            const adjustIndex = priceData[i].index - 1n;
-            let outerIndex = adjustIndex / 5n;
+            let outerIndex = toBigInt(i) / 4n;
             if (!encodedData.has(outerIndex)) {
-                encodedData.set(outerIndex, toBigInt(outerIndex));
+                encodedData.set(outerIndex, 0n);
             }
             let param = encodedData.get(outerIndex);
-            param += 2n ** ((adjustIndex % 5n) + 8n);
+            param += priceData[i].index * 2n ** ((toBigInt(i) % 4n) * 64n);
             if (priceData[i].tick >= 0n) {
-                param += priceData[i].tick * 2n ** ((adjustIndex % 5n) * 48n + 16n);
+                param += priceData[i].tick * 2n ** ((toBigInt(i) % 4n) * 64n + 16n);
             } else {
-                param += (2n ** 24n + priceData[i].tick) * 2n ** ((adjustIndex % 5n) * 48n + 16n);
+                param += (2n ** 24n + priceData[i].tick) * 2n ** ((toBigInt(i) % 4n) * 64n + 16n);
             }
-            param += (priceData[i].publishTime - minTimestamp) * 2n ** ((adjustIndex % 5n) * 48n + 40n);
+            param += (priceData[i].publishTime - minTimestamp) * 2n ** ((toBigInt(i) % 4n) * 64n + 40n);
             encodedData.set(outerIndex, param);
         }
         let res = [];
@@ -77,46 +76,6 @@ describe("PythAdaptor", () => {
     }
 
     describe("PythAdaptor test", () => {
-        it("reassignAssetIndex test", async () => {
-            const latestBlockTimestamp = await time.latest();
-            const {pythAdaptor, owner, tickMathTest} = await loadFixture(deployFixture);
-            let {res, minTimestamp} = gatherPriceData([
-                {
-                    // eth
-                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[0])),
-                    publishTime: toBigInt(latestBlockTimestamp),
-                    index: 1n,
-                },
-            ]);
-            await expect(
-                pythAdaptor.updatePriceFeeds(
-                    res,
-                    minTimestamp,
-                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52"
-                )
-            );
-            await expect(pythAdaptor.reassignAssetIndex(1, assetIdsPart1[0]))
-                .to.revertedWithCustomError(pythAdaptor, "InvalidReassignAssetIndexArgs")
-                .withArgs(assetIdsPart1[0], 1);
-
-            await expect(pythAdaptor.reassignAssetIndex(0, assetIdsPart2[0]))
-                .to.revertedWithCustomError(pythAdaptor, "InvalidReassignAssetIndexArgs")
-                .withArgs(assetIdsPart2[0], 0);
-
-            await expect(pythAdaptor.reassignAssetIndex(5, assetIdsPart2[0]))
-                .to.revertedWithCustomError(pythAdaptor, "InvalidReassignAssetIndexArgs")
-                .withArgs(assetIdsPart2[0], 5);
-
-            await expect(pythAdaptor.reassignAssetIndex(1, assetIdsPart2[0]))
-                .to.emit(pythAdaptor, "AssetIndexAssigned")
-                .withArgs(assetIdsPart2[0], 1);
-
-            expect(await pythAdaptor.assetsIndexes(assetIdsPart2[0])).to.equal(1);
-
-            await expect(pythAdaptor.getPriceUnsafe(assetIds[0]))
-                .to.revertedWithCustomError(pythAdaptor, "PriceDataNotExist")
-                .withArgs(assetIds[0]);
-        });
         it("update prices and clear price", async () => {
             const {pythAdaptor, owner, tickMathTest} = await loadFixture(deployFixture);
             await pythAdaptor.assignAssetsIndexes(assetIdsPart2);

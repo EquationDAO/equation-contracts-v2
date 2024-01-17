@@ -11,8 +11,8 @@ interface IPythAdaptor {
     // Both the price and confidence are stored in a fixed-point numeric representation,
     // `x * (10^expo)`, where `expo` is the exponent.
     //
-    // Please refer to the documentation at https://docs.pyth.network/documentation/pythnet-price-feeds/best-practices for how
-    // to how this price safely.
+    // Please refer to the documentation at https://docs.pyth.network/documentation/pythnet-price-feeds/best-practices
+    // for how to how this price safely.
     struct PythStructsPrice {
         // Price
         int64 price;
@@ -45,9 +45,6 @@ interface IPythAdaptor {
     /// @notice Error thrown when the asset index is already assigned
     error AssetIndexAlreadyAssigned(bytes32 asset);
 
-    /// @notice Error thrown when invalid asset or index was pass to function `reassignAssetIndex`
-    error InvalidReassignAssetIndexArgs(bytes32 asset, uint256 index);
-
     /// @notice Error thrown when the asset index is not exist
     error InvalidAssetIndex(uint256 index);
 
@@ -55,16 +52,12 @@ interface IPythAdaptor {
     error PriceDataNotExist(bytes32 asset);
 
     /// @notice Update price feeds with given update messages.
-    /// @param prices Array of price update data. A price data consists of three parts.
-    /// The first part is a uint8 data that represents the group number (all assets are divided into groups of 5).
-    /// The bit of second uint8 are used to indicate whether the corresponding price data exists.
-    /// The third part is 5 sets of price data that contains price tick and publish time diff.
-    ///                                       position-4    position-3    position-2     position-1      position-0         group id
-    /// The example packed value of price: 0x000000000000|0x000000000000|0x000000000000|0x000006008c21|0x000005fff9c0|0x03|0x01
-    /// '0x01' means group id is 1. Data is bind with asset that index is grater than 6 (0x01 * 5 + 1)
-    /// 0x03=0b00000011 indicate that packed value has 2 valid data(position-0 and position-1);
-    /// 0x000005fff9c0(position-0): publishTimeDiff=5&int24(0xfff9c0)
-    /// 0x000006008c21(position-1): publishTimeDiff=6&priceTick=int24(008c21)
+    /// @param prices Array of price update data. A price data is split into 4 slots. Slot is consisted of asset index,
+    /// price tick and price publish time difference.
+    ///                                 slot-3             slot-2           slot-1             slot-0
+    /// The example packed value:   0x000003001da30004 | 0x00000200b2ad0003 | 0x00000101a0ad0002 | 0x0000000132240001
+    ///                              /       \      \
+    ///       publishTimeDiff=0x000003 tick=0x001da3 assetIdIndex=0x0004
     /// @param minPublishTime The minimum publish time of the prices
     /// @param encodedVaas Encoded Vaas data
     function updatePriceFeeds(PackedValue[] calldata prices, uint256 minPublishTime, bytes32 encodedVaas) external;
@@ -95,7 +88,4 @@ interface IPythAdaptor {
     /// @notice Assign indexes to assets
     /// @param assets Array of asset ids
     function assignAssetsIndexes(bytes32[] calldata assets) external;
-
-    /// @notice Reassign a asset index to a asset
-    function reassignAssetIndex(uint256 index, bytes32 asset) external;
 }
