@@ -311,9 +311,9 @@ library PriceUtil {
             (uint256 aX128, int256 bX96) = calculateAX128AndBX96(globalSide, _step.from, _step.to);
             uint256 sizeAfter = _step.improveBalance ? _step.current.size - _sizeUsed : _step.current.size + _sizeUsed;
             if (globalSide.isLong()) bX96 = -bX96;
-            (uint256 aTimesSizeX96Down, uint256 aTimesSizeX96Up) = Math.mulDiv2(aX128, sizeAfter, Constants.Q32);
-            uint256 aTimesSizeX96 = _step.improveBalance ? aTimesSizeX96Down : aTimesSizeX96Up;
-            premiumRateAfterX96 = (aTimesSizeX96.toInt256() + bX96).toUint256().toUint128();
+            premiumRateAfterX96 = (Math.mulDivUp(aX128, sizeAfter, Constants.Q32).toInt256() + bX96)
+                .toUint256()
+                .toUint128();
         }
     }
 
