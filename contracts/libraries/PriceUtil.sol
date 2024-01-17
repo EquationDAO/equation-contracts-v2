@@ -312,9 +312,7 @@ library PriceUtil {
             uint256 sizeAfter = _step.improveBalance ? _step.current.size - _sizeUsed : _step.current.size + _sizeUsed;
             if (globalSide.isLong()) bX96 = -bX96;
             (uint256 aTimesSizeX96Down, uint256 aTimesSizeX96Up) = Math.mulDiv2(aX128, sizeAfter, Constants.Q32);
-            uint256 aTimesSizeX96;
-            if (_step.improveBalance) aTimesSizeX96 = aTimesSizeX96Down;
-            else aTimesSizeX96 = aTimesSizeX96Up;
+            uint256 aTimesSizeX96 = _step.improveBalance ? aTimesSizeX96Down : aTimesSizeX96Up;
             premiumRateAfterX96 = (aTimesSizeX96.toInt256() + bX96).toUint256().toUint128();
         }
     }
