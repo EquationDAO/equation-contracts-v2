@@ -15,11 +15,11 @@ contract PriceUtilTest is Test {
     IMarketManager.GlobalLiquidityPosition private globalPosition;
     uint8 private liquidationVertexIndex;
 
-    struct CalculateAX128AndBX96Params {
+    struct CalculateAX248AndBX96Params {
         Side globalSide;
         IMarketManager.PriceVertex from;
         IMarketManager.PriceVertex to;
-        uint256 aX128;
+        uint256 aX248;
         int256 bX96;
     }
 
@@ -1322,7 +1322,7 @@ contract PriceUtilTest is Test {
     // Index price is stable
     function test_updatePriceState_FromLongMoveRandom() public {
         uint160 tradePriceX96;
-        uint160 currentIndexPriceX96 = Math.mulDiv(2000, Constants.Q96, 1e12).toUint160(); // 2000
+        uint160 currentIndexPriceX96 = Math.mulDiv(2000, Constants.Q96, 1e12).toUint160(); // 158456325028528675187
         UpdatePriceStateCase[6] memory longCases = [
             UpdatePriceStateCase({
                 id: 1,
@@ -1797,75 +1797,75 @@ contract PriceUtilTest is Test {
         assertEq(Side.unwrap(globalPosition.side), Side.unwrap(_case.globalSideExpect), "side");
     }
 
-    function test_CalculateAX128AndBX96() public {
+    function test_CalculateAX248AndBX96() public {
         uint256 length = 18;
-        CalculateAX128AndBX96Params[] memory items = new CalculateAX128AndBX96Params[](length);
+        CalculateAX248AndBX96Params[] memory items = new CalculateAX248AndBX96Params[](length);
         // global short && a > 0 && b = 0
-        items[0] = CalculateAX128AndBX96Params(
+        items[0] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(0, 0),
             IMarketManager.PriceVertex(1, uint128(2 * Constants.Q96)),
-            2 * Constants.Q96 * Constants.Q32,
+            2 * Constants.Q96 * Constants.Q152,
             0
         );
         // global long && a > 0 && b = 0
-        items[1] = CalculateAX128AndBX96Params(
+        items[1] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(0, 0),
             IMarketManager.PriceVertex(1, uint128(2 * Constants.Q96)),
-            2 * Constants.Q96 * Constants.Q32,
+            2 * Constants.Q96 * Constants.Q152,
             0
         );
         // global short && a > 0 && b > 0
-        items[2] = CalculateAX128AndBX96Params(
+        items[2] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(3 * Constants.Q96)),
             IMarketManager.PriceVertex(2, uint128(5 * Constants.Q96)),
-            2 * Constants.Q96 * Constants.Q32,
+            2 * Constants.Q96 * Constants.Q152,
             1 * int256(Constants.Q96)
         );
         // global long && a > 0 && b < 0
-        items[3] = CalculateAX128AndBX96Params(
+        items[3] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(3 * Constants.Q96)),
             IMarketManager.PriceVertex(2, uint128(5 * Constants.Q96)),
-            2 * Constants.Q96 * Constants.Q32,
+            2 * Constants.Q96 * Constants.Q152,
             -1 * int256(Constants.Q96)
         );
         // global short && a > 0 && b < 0
-        items[4] = CalculateAX128AndBX96Params(
+        items[4] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(1 * Constants.Q96)),
             IMarketManager.PriceVertex(2, uint128(3 * Constants.Q96)),
-            2 * Constants.Q96 * Constants.Q32,
+            2 * Constants.Q96 * Constants.Q152,
             -1 * int256(Constants.Q96)
         );
         // global long && a > 0 && b > 0
-        items[5] = CalculateAX128AndBX96Params(
+        items[5] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(1 * Constants.Q96)),
             IMarketManager.PriceVertex(2, uint128(3 * Constants.Q96)),
-            2 * Constants.Q96 * Constants.Q32,
+            2 * Constants.Q96 * Constants.Q152,
             1 * int256(Constants.Q96)
         );
         // global short && a > 0 && b > 0 (aX96 round up, bX96 round down)
-        items[6] = CalculateAX128AndBX96Params(
+        items[6] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(1 * Constants.Q96)),
-            IMarketManager.PriceVertex(5, uint128(3 * Constants.Q96) - 1),
-            39614081257132168796771975168, // Constants.Q96 / 2
-            39614081257132168796771975168 // Constants.Q96 / 2
+            IMarketManager.PriceVertex(4, uint128(3 * Constants.Q96) - 1),
+            301541899055510925582216106791555096444282638558694587560154798172096779606, // (2 * Constants.Q96-1) * Constants.Q152 / 3 + 1
+            26409387504754779197847983445 // (2 * Constants.Q96 + 1) / 3
         );
         // global long && a > 0 && b < 0 (aX96 round up, bX96 round down)
-        items[7] = CalculateAX128AndBX96Params(
+        items[7] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(1 * Constants.Q96)),
-            IMarketManager.PriceVertex(5, uint128(3 * Constants.Q96) - 1),
-            39614081257132168796771975168, // Constants.Q96 / 2
-            -39614081257132168796771975168 // -Constants.Q96 / 2
+            IMarketManager.PriceVertex(4, uint128(3 * Constants.Q96) - 1),
+            301541899055510925582216106791555096444282638558694587560154798172096779606, // (2 * Constants.Q96-1) * Constants.Q152 / 3 + 1
+            -26409387504754779197847983445 // -(2 * Constants.Q96 + 1) / 3
         );
         // global short && a = 0 && b > 0
-        items[8] = CalculateAX128AndBX96Params(
+        items[8] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(10 * Constants.Q96)),
             IMarketManager.PriceVertex(2, uint128(10 * Constants.Q96)),
@@ -1873,7 +1873,7 @@ contract PriceUtilTest is Test {
             10 * int256(Constants.Q96)
         );
         // global long && a = 0 && b < 0
-        items[9] = CalculateAX128AndBX96Params(
+        items[9] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(10 * Constants.Q96)),
             IMarketManager.PriceVertex(2, uint128(10 * Constants.Q96)),
@@ -1881,55 +1881,55 @@ contract PriceUtilTest is Test {
             -10 * int256(Constants.Q96)
         );
         // global short && a > 0 && b = 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[10] = CalculateAX128AndBX96Params(
+        items[10] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 4)),
             IMarketManager.PriceVertex(2, uint128(Constants.Q96 / 2)),
-            19807040628566084398385987584, // 2 * Constants.Q96 / 4
+            113078212145816597093331040047546785012958969400039613319782796882727665664, // Constants.Q96 * Constants.Q152 / 4
             0
         );
         // global long && a > 0 && b = 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[11] = CalculateAX128AndBX96Params(
+        items[11] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 4)),
             IMarketManager.PriceVertex(2, uint128(Constants.Q96 / 2)),
-            19807040628566084398385987584, // 2 * Constants.Q96 / 4
+            113078212145816597093331040047546785012958969400039613319782796882727665664, // Constants.Q96 * Constants.Q152 / 4
             0
         );
         // global short && a > 0 && b < 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[12] = CalculateAX128AndBX96Params(
+        items[12] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 5)),
             IMarketManager.PriceVertex(2, uint128(Constants.Q96 / 2)),
-            23768448754279301278063185101, // 3 * Constants.Q96 / 10 + 1
+            135693854574979916511997248058197940169715531184894164759298952368379396096, // 3 * Constants.Q96 * Constants.Q152 / 10 + 1141798154164767904846628775559596109106197300
             -7922816251426433759354395034 // -(Constants.Q96 / 10 + 1)
         );
         // global long && a > 0 && b > 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[13] = CalculateAX128AndBX96Params(
+        items[13] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 5)),
             IMarketManager.PriceVertex(2, uint128(Constants.Q96 / 2)),
-            23768448754279301278063185101, // 3 * Constants.Q96 / 10 + 1
+            135693854574979916511997248058197940169715531184894164759298952368379396096, // 3 * Constants.Q96 * Constants.Q152 / 10 + 1141798154164767904846628775559596109106197300
             7922816251426433759354395034 // Constants.Q96 / 10 + 1
         );
         // global short && a > 0 && b > 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[14] = CalculateAX128AndBX96Params(
+        items[14] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(uint128(Constants.Q96 / 8), uint128(Constants.Q96 / 5)),
             IMarketManager.PriceVertex(uint128(Constants.Q96 / 3), uint128(Constants.Q96 / 2)),
-            2, // 36 / 25 + 1
+            8220946709986328914895727184264287972504417338, // 36 * Constants.Q152/ 25 + 235195986939796784
             1584563250285286751870879006 // uint128(Constants.Q96) / 50
         );
         // global long && a > 0 && b < 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[15] = CalculateAX128AndBX96Params(
+        items[15] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(uint128(Constants.Q96 / 8), uint128(Constants.Q96 / 5)),
             IMarketManager.PriceVertex(uint128(Constants.Q96 / 3), uint128(Constants.Q96 / 2)),
-            2, // 36 / 25 + 1
+            8220946709986328914895727184264287972504417338, // 36 * Constants.Q152/ 25 + 235195986939796784
             -1584563250285286751870879006 // -uint128(Constants.Q96) / 50
         );
         // global short && a = 0 && b > 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[16] = CalculateAX128AndBX96Params(
+        items[16] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 2)),
             IMarketManager.PriceVertex(2, uint128(Constants.Q96 / 2)),
@@ -1937,7 +1937,7 @@ contract PriceUtilTest is Test {
             int256(Constants.Q96) / 2
         );
         // global long && a = 0 && b < 0 (0 <= premiumRateX96 <= Constants.Q96)
-        items[17] = CalculateAX128AndBX96Params(
+        items[17] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 2)),
             IMarketManager.PriceVertex(2, uint128(Constants.Q96 / 2)),
@@ -1945,23 +1945,23 @@ contract PriceUtilTest is Test {
             -int256(Constants.Q96) / 2
         );
         for (uint256 i = 0; i < length; i++) {
-            CalculateAX128AndBX96Params memory item = items[i];
-            (uint256 aX128, int256 bX96) = PriceUtil.calculateAX128AndBX96(item.globalSide, item.from, item.to);
-            assertEq(aX128, item.aX128, string.concat("aX128: test case: ", vm.toString(i)));
+            CalculateAX248AndBX96Params memory item = items[i];
+            (uint256 aX248, int256 bX96) = PriceUtil.calculateAX248AndBX96(item.globalSide, item.from, item.to);
+            assertEq(aX248, item.aX248, string.concat("aX248: test case: ", vm.toString(i)));
             assertEq(bX96, item.bX96, string.concat("bX96: test case: ", vm.toString(i)));
         }
     }
 
-    function testFuzz_CalculateAX96AndBX96(
+    function testFuzz_CalculateAX248AndBX96(
         Side _globalSide,
         IMarketManager.PriceVertex memory _from,
         IMarketManager.PriceVertex memory _to
     ) public pure {
-        _assumeForCalculateAX96AndBX96(_globalSide, _from, _to);
-        PriceUtil.calculateAX128AndBX96(_globalSide, _from, _to);
+        _assumeForCalculateAX248AndBX96(_globalSide, _from, _to);
+        PriceUtil.calculateAX248AndBX96(_globalSide, _from, _to);
     }
 
-    function _assumeForCalculateAX96AndBX96(
+    function _assumeForCalculateAX248AndBX96(
         Side _globalSide,
         IMarketManager.PriceVertex memory _from,
         IMarketManager.PriceVertex memory _to
@@ -1972,17 +1972,11 @@ contract PriceUtilTest is Test {
         if (_from.size > _to.size) {
             sizeDelta = _from.size - _to.size;
             vm.assume(_from.premiumRateX96 >= _to.premiumRateX96);
+            vm.assume(_from.premiumRateX96 <= Constants.Q96);
         } else {
             sizeDelta = _to.size - _from.size;
             vm.assume(_from.premiumRateX96 <= _to.premiumRateX96);
-        }
-
-        uint256 numeratorPart1X96 = uint256(_from.premiumRateX96) * _to.size;
-        uint256 numeratorPart2X96 = uint256(_to.premiumRateX96) * _from.size;
-        if (numeratorPart1X96 > numeratorPart2X96) {
-            vm.assume((numeratorPart1X96 - numeratorPart2X96) / sizeDelta <= uint256(type(int256).max));
-        } else {
-            vm.assume((numeratorPart2X96 - numeratorPart1X96) / sizeDelta <= uint256(type(int256).max));
+            vm.assume(_to.premiumRateX96 <= Constants.Q96);
         }
     }
 
@@ -2108,7 +2102,7 @@ contract PriceUtilTest is Test {
             sizeCurrent: 1.2e18,
             reached: false,
             sizeUsed: 0.1e18,
-            premiumRateAfterX96: 18222477379073566240645604966
+            premiumRateAfterX96: 18222477378280797646515108578
         });
         // long && !reached && !improveBalance (sizeUsed < to.size - sizeCurrent)
         items[3] = CalculatePremiumRateAfterX96Params({
@@ -2119,7 +2113,7 @@ contract PriceUtilTest is Test {
             sizeCurrent: 1.2e18,
             reached: false,
             sizeUsed: 0.5e18,
-            premiumRateAfterX96: 32483546632073566240645604966
+            premiumRateAfterX96: 32483546630848378413353019638
         });
         // short && reached && improveBalance (sizeUsed = sizeCurrent - to.size)
         items[4] = CalculatePremiumRateAfterX96Params({
@@ -2152,7 +2146,7 @@ contract PriceUtilTest is Test {
             sizeCurrent: 1.2e18,
             reached: false,
             sizeUsed: 0.1e18,
-            premiumRateAfterX96: 18222477379073566240645604966
+            premiumRateAfterX96: 18222477378280797646515108578
         });
         // short && !reached && !improveBalance (sizeUsed < to.size - sizeCurrent)
         items[7] = CalculatePremiumRateAfterX96Params({
@@ -2163,7 +2157,7 @@ contract PriceUtilTest is Test {
             sizeCurrent: 1.2e18,
             reached: false,
             sizeUsed: 0.5e18,
-            premiumRateAfterX96: 32483546632073566240645604966
+            premiumRateAfterX96: 32483546630848378413353019638
         });
 
         for (uint256 i = 0; i < length; i++) {
@@ -2191,12 +2185,12 @@ contract PriceUtilTest is Test {
         _sizeUsed = sizeUsed;
         if (!_reached) {
             Side globalSide = _step.improveBalance ? _step.side : _step.side.flip();
-            _assumeForCalculateAX96AndBX96(globalSide, _step.from, _step.to);
-            (uint256 aX128, int256 bX96) = PriceUtil.calculateAX128AndBX96(globalSide, _step.from, _step.to);
+            _assumeForCalculateAX248AndBX96(globalSide, _step.from, _step.to);
+            (uint256 aX248, int256 bX96) = PriceUtil.calculateAX248AndBX96(globalSide, _step.from, _step.to);
             uint256 targetSize = _step.improveBalance ? _step.current.size - _sizeUsed : _step.current.size + _sizeUsed;
-            vm.assume(aX128 <= uint256(type(int256).max) / targetSize);
+            vm.assume(aX248 <= uint256(type(int256).max) / targetSize);
             if (globalSide.isLong()) bX96 = -bX96;
-            vm.assume(bX96 <= int256(uint256(type(uint128).max)) - (aX128 * targetSize).toInt256());
+            vm.assume(bX96 <= int256(uint256(type(uint128).max)) - (aX248 * targetSize).toInt256());
         }
         PriceUtil.calculatePremiumRateAfterX96(_step, _reached, _sizeUsed);
     }
@@ -2214,7 +2208,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 140629988462819199227,
             sizeUsed: 0.2e18,
             reached: true,
@@ -2229,7 +2223,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 140629988462819199227,
             sizeUsed: 0.2e18,
             reached: true,
@@ -2244,11 +2238,11 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
-            tradePriceX96: 141620340495586157028,
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
+            tradePriceX96: 141620340494247503447,
             sizeUsed: 0.1e18,
             reached: false,
-            premiumRateAfterX96: 20467275317077389598923991723
+            premiumRateAfterX96: 20467275316184953878332187171
         });
         // long && improveBalance && sizeLeft > sizeCurrent - sizeTo
         items[3] = SimulateMoveParams({
@@ -2259,7 +2253,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 17826336565709475959,
             sizeUsed: 0.2e18,
             reached: true,
@@ -2274,7 +2268,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 17826336565709475959,
             sizeUsed: 0.2e18,
             reached: true,
@@ -2289,11 +2283,11 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
-            tradePriceX96: 16835984532942518158,
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
+            tradePriceX96: 16835984534281171739,
             sizeUsed: 0.1e18,
             reached: false,
-            premiumRateAfterX96: 20467275317077389598923991723
+            premiumRateAfterX96: 20467275316184953878332187171
         });
         // short && !improveBalance && sizeLeft > sizeTo - sizeCurrent
         items[6] = SimulateMoveParams({
@@ -2304,7 +2298,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 7922816251426433759,
             sizeUsed: 0.8e18,
             reached: true,
@@ -2319,7 +2313,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 7922816251426433759,
             sizeUsed: 0.8e18,
             reached: true,
@@ -2334,11 +2328,11 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
-            tradePriceX96: 10893872343642518157,
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
+            tradePriceX96: 10893872345711346418,
             sizeUsed: 0.5e18,
             reached: false,
-            premiumRateAfterX96: 24428683443277389598923991723
+            premiumRateAfterX96: 24428683441898170758009384687
         });
         // long && !improveBalance && sizeLeft > sizeTo - sizeCurrent
         items[9] = SimulateMoveParams({
@@ -2349,7 +2343,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 150533508777102241427,
             sizeUsed: 0.8e18,
             reached: true,
@@ -2364,7 +2358,7 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
             tradePriceX96: 150533508777102241427,
             sizeUsed: 0.8e18,
             reached: true,
@@ -2379,11 +2373,11 @@ contract PriceUtilTest is Test {
             from: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 4)), // 19807040628566084398385987584
             current: IMarketManager.PriceVertex(1.2e18, uint128((4 * Constants.Q96) / 15)), // 21127510003803823358278386756
             to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 3)), // 26409387504754779197847983445
-            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18),
-            tradePriceX96: 147562452684886157029,
+            basisIndexPriceX96: uint160((3000 * 1e6 * Constants.Q96) / 1e18), // 237684487542793012780
+            tradePriceX96: 147562452682817328768,
             sizeUsed: 0.5e18,
             reached: false,
-            premiumRateAfterX96: 24428683443277389598923991723
+            premiumRateAfterX96: 24428683441898170758009384687
         });
         for (uint256 i = 0; i < length; i++) {
             SimulateMoveParams memory item = items[i];
@@ -2399,14 +2393,14 @@ contract PriceUtilTest is Test {
             });
             (int160 tradePriceX96, uint128 sizeUsed, bool reached, uint128 premiumRateAfterX96) = PriceUtil
                 .simulateMove(_step);
-            assertEq(tradePriceX96, item.tradePriceX96, string.concat("tradePriceX96: test case: ", vm.toString(i)));
-            assertEq(sizeUsed, item.sizeUsed, string.concat("sizeUsed: test case: ", vm.toString(i)));
             assertEq(reached, item.reached, string.concat("reached: test case: ", vm.toString(i)));
+            assertEq(sizeUsed, item.sizeUsed, string.concat("sizeUsed: test case: ", vm.toString(i)));
             assertEq(
                 premiumRateAfterX96,
                 item.premiumRateAfterX96,
                 string.concat("premiumRateAfterX96: test case: ", vm.toString(i))
             );
+            assertEq(tradePriceX96, item.tradePriceX96, string.concat("tradePriceX96: test case: ", vm.toString(i)));
         }
     }
 
