@@ -28,12 +28,15 @@ describe("PythAdaptor", () => {
         const [owner] = await ethers.getSigners();
         const PythAdaptor = await ethers.getContractFactory("PythAdaptor");
         const TickMathTest = await ethers.getContractFactory("TickMathTest");
+        const Helper = await ethers.getContractFactory("PythAdaptorHelper");
         const pythAdaptor = await PythAdaptor.deploy();
+        const helper = await Helper.deploy(pythAdaptor);
         await pythAdaptor.assignAssetsIndexes(assetIdsPart1);
         await pythAdaptor.setUpdater(owner, true);
+        await pythAdaptor.setUpdater(helper, true);
         const tickMathTest = await TickMathTest.deploy();
 
-        return {pythAdaptor, owner, tickMathTest};
+        return {pythAdaptor, owner, tickMathTest, helper};
     }
 
     function gatherPriceData(priceData: PriceData[]) {
@@ -135,7 +138,6 @@ describe("PythAdaptor", () => {
             )
                 .to.emit(pythAdaptor, "LogVaas")
                 .withArgs("0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52");
-
             for (let i = 0; i < assetIds.length; ++i) {
                 let priceData = await pythAdaptor.getPriceUnsafe(assetIds[i]);
                 let truePrice = Number(rawPrices[i]) * 10 ** 8;
@@ -145,7 +147,73 @@ describe("PythAdaptor", () => {
                 }
                 expect(diff / truePrice).lt(canIgnoredDeviationPercent);
             }
-            await pythAdaptor.clearPrices();
+            await pythAdaptor.clearPrices(assetIds);
+            for (let i = 0; i < assetIds.length; ++i) {
+                await expect(pythAdaptor.getPriceUnsafe(assetIds[i]))
+                    .to.revertedWithCustomError(pythAdaptor, "PriceDataNotExist")
+                    .withArgs(assetIds[i]);
+            }
+        });
+
+        it("test affectedAssetIds", async () => {
+            const {pythAdaptor, helper, owner, tickMathTest} = await loadFixture(deployFixture);
+            await pythAdaptor.assignAssetsIndexes(assetIdsPart2);
+            const latestBlockTimestamp = await time.latest();
+            const publishTimeDiff = [-1n, 0n, 1n, 2n, 3n, 4n, 5n];
+            let {res, minTimestamp} = gatherPriceData([
+                {
+                    // eth
+                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[0])),
+                    publishTime: toBigInt(latestBlockTimestamp) + publishTimeDiff[0],
+                    index: 1n,
+                },
+                {
+                    // btc
+                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[1])),
+                    publishTime: toBigInt(latestBlockTimestamp) + publishTimeDiff[1],
+                    index: 2n,
+                },
+                {
+                    // sol
+                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[2])),
+                    publishTime: toBigInt(latestBlockTimestamp) + publishTimeDiff[2],
+                    index: 3n,
+                },
+                {
+                    // arb
+                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[3])),
+                    publishTime: toBigInt(latestBlockTimestamp) + publishTimeDiff[3],
+                    index: 4n,
+                },
+                {
+                    // op
+                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[4])),
+                    publishTime: toBigInt(latestBlockTimestamp) + publishTimeDiff[4],
+                    index: 5n,
+                },
+                {
+                    // matic
+                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[5])),
+                    publishTime: toBigInt(latestBlockTimestamp) + publishTimeDiff[5],
+                    index: 6n,
+                },
+                {
+                    // avax
+                    tick: await tickMathTest.getTickAtSqrtRatio(toSqrtX96(rawPrices[6])),
+                    publishTime: toBigInt(latestBlockTimestamp) + publishTimeDiff[6],
+                    index: 7n,
+                },
+            ]);
+            await expect(
+                helper.updatePriceFeeds(
+                    res,
+                    minTimestamp,
+                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52"
+                )
+            )
+                .to.emit(pythAdaptor, "LogVaas")
+                .withArgs("0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52");
+            expect(await helper.affectedAssetIdLength()).equal(8);
             for (let i = 0; i < assetIds.length; ++i) {
                 await expect(pythAdaptor.getPriceUnsafe(assetIds[i]))
                     .to.revertedWithCustomError(pythAdaptor, "PriceDataNotExist")
@@ -247,7 +315,7 @@ describe("PythAdaptor", () => {
                 }
                 expect(diff / truePrice).lt(canIgnoredDeviationPercent);
             }
-            await pythAdaptor.clearPrices();
+            await pythAdaptor.clearPrices([ETHAssetId, BTCAssetId, SOLAssetId]);
             for (let i = 0; i < assetIdsPart1.length; ++i) {
                 await expect(pythAdaptor.getPriceUnsafe(assetIdsPart1[i]))
                     .to.revertedWithCustomError(pythAdaptor, "PriceDataNotExist")

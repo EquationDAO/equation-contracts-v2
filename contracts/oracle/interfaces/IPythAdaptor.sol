@@ -60,10 +60,16 @@ interface IPythAdaptor {
     ///       publishTimeDiff=0x000003 tick=0x001da3 assetIdIndex=0x0004
     /// @param minPublishTime The minimum publish time of the prices
     /// @param encodedVaas Encoded Vaas data
-    function updatePriceFeeds(PackedValue[] calldata prices, uint256 minPublishTime, bytes32 encodedVaas) external;
+    /// @return affectedAssetIds List of affected asset ids.
+    function updatePriceFeeds(
+        PackedValue[] calldata prices,
+        uint256 minPublishTime,
+        bytes32 encodedVaas
+    ) external returns (bytes32[] memory affectedAssetIds);
 
     /// @notice Clear price data for gas optimization
-    function clearPrices() external;
+    /// @param toClear List of asset ids to clear
+    function clearPrices(bytes32[] memory toClear) external;
 
     /// @notice Set updater status active or not
     /// @param account Updater address

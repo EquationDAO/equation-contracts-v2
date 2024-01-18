@@ -10,12 +10,11 @@ import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 contract PythAdaptor is IPythAdaptor, Governable {
     using SafeCast for int256;
 
-    // whitelist mapping of price updater
+    // @notice whitelist mapping of price updater
     mapping(address => bool) private updaters;
 
     mapping(bytes32 => CompressedPrice) private priceData;
-    /// @notice
-    bytes32[] private existPriceDataAssets;
+
     /// @notice The minimum publish time of every asset from the latest round of price feed
     uint256 private minPublishTime;
 
@@ -40,9 +39,10 @@ contract PythAdaptor is IPythAdaptor, Governable {
         PackedValue[] calldata _prices,
         uint256 _minPublishTime,
         bytes32 _encodedVaas
-    ) external onlyUpdater {
+    ) external onlyUpdater returns (bytes32[] memory affectedAssetIds) {
         uint256 packedValueLen = _prices.length;
         uint256 maxAssetsIndex = assetIndex;
+        affectedAssetIds = new bytes32[](packedValueLen * MAX_PRICE_PER_WORD);
         for (uint256 i; i < packedValueLen; ++i) {
             PackedValue price = _prices[i];
             for (uint8 j; j < MAX_PRICE_PER_WORD; ++j) {
@@ -57,7 +57,7 @@ contract PythAdaptor is IPythAdaptor, Governable {
                     publishTimeDiff: pricePublishTimeDiff,
                     set: true
                 });
-                existPriceDataAssets.push(assetId);
+                affectedAssetIds[i * MAX_PRICE_PER_WORD + j] = assetId;
             }
         }
 
@@ -67,11 +67,10 @@ contract PythAdaptor is IPythAdaptor, Governable {
     }
 
     /// @inheritdoc IPythAdaptor
-    function clearPrices() public onlyUpdater {
-        uint256 dataLength = existPriceDataAssets.length;
+    function clearPrices(bytes32[] memory _toClear) external onlyUpdater {
+        uint256 dataLength = _toClear.length;
         for (uint256 i; i < dataLength; ++i) {
-            delete priceData[existPriceDataAssets[i]];
-            delete existPriceDataAssets[i];
+            delete priceData[_toClear[i]];
         }
         minPublishTime = 0;
     }
