@@ -241,17 +241,17 @@ library PriceUtil {
         }
     }
 
-    function calculateAX96AndBX96(
+    function calculateAX248AndBX96(
         Side _globalSide,
         IMarketManager.PriceVertex memory _from,
         IMarketManager.PriceVertex memory _to
-    ) internal pure returns (uint256 aX96, int256 bX96) {
+    ) internal pure returns (uint256 aX248, int256 bX96) {
         if (_from.size > _to.size) (_from, _to) = (_to, _from);
         assert(_to.premiumRateX96 >= _from.premiumRateX96);
 
         unchecked {
             uint128 sizeDelta = _to.size - _from.size;
-            aX96 = Math.ceilDiv(_to.premiumRateX96 - _from.premiumRateX96, sizeDelta);
+            aX248 = Math.mulDivUp(_to.premiumRateX96 - _from.premiumRateX96, Constants.Q152, sizeDelta);
 
             uint256 numeratorPart1X96 = uint256(_from.premiumRateX96) * _to.size;
             uint256 numeratorPart2X96 = uint256(_to.premiumRateX96) * _from.size;
@@ -308,10 +308,12 @@ library PriceUtil {
             premiumRateAfterX96 = _step.to.premiumRateX96;
         } else {
             Side globalSide = _step.improveBalance ? _step.side : _step.side.flip();
-            (uint256 aX96, int256 bX96) = calculateAX96AndBX96(globalSide, _step.from, _step.to);
+            (uint256 aX248, int256 bX96) = calculateAX248AndBX96(globalSide, _step.from, _step.to);
             uint256 sizeAfter = _step.improveBalance ? _step.current.size - _sizeUsed : _step.current.size + _sizeUsed;
             if (globalSide.isLong()) bX96 = -bX96;
-            premiumRateAfterX96 = ((aX96 * sizeAfter).toInt256() + bX96).toUint256().toUint128();
+            premiumRateAfterX96 = (Math.mulDivUp(aX248, sizeAfter, Constants.Q152).toInt256() + bX96)
+                .toUint256()
+                .toUint128();
         }
     }
 

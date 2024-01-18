@@ -18,4 +18,5 @@ library Constants {
     uint256 internal constant Q32 = 1 << 32;
     uint256 internal constant Q64 = 1 << 64;
     uint256 internal constant Q96 = 1 << 96;
+    uint256 internal constant Q152 = 1 << 152;
 }
