@@ -82,15 +82,24 @@ contract PriceUtilTest is Test {
         liquidationVertexIndex = 4;
         priceState.priceVertices = [
             IMarketManager.PriceVertex(0, 0), // v0 (0, 0)
-            IMarketManager.PriceVertex(39238929010000000, Math.mulDiv(5, Constants.Q96, 10000).toUint128()), // v1 (2%, 0.05%)
-            IMarketManager.PriceVertex(58858393515000000, Math.mulDiv(10, Constants.Q96, 10000).toUint128()), // v2 (3%, 0.1%)
-            IMarketManager.PriceVertex(78477858020000000, Math.mulDiv(15, Constants.Q96, 10000).toUint128()), // v3 (4%, 0.15%)
-            IMarketManager.PriceVertex(98097322525000000, Math.mulDiv(20, Constants.Q96, 10000).toUint128()), // v4 (5%, 0.2%)
-            IMarketManager.PriceVertex(196194645050000000, Math.mulDiv(100, Constants.Q96, 10000).toUint128()), // v5 (10%, 1%)
-            IMarketManager.PriceVertex(392389290100000000, Math.mulDiv(200, Constants.Q96, 10000).toUint128()), // v6 (20%, 2%)
-            IMarketManager.PriceVertex(980973225250000000, Math.mulDiv(500, Constants.Q96, 10000).toUint128()), // v7 (50%, 5%)
-            IMarketManager.PriceVertex(1373362515350000000, Math.mulDiv(1000, Constants.Q96, 10000).toUint128()), // v8 (70%, 10%)
-            IMarketManager.PriceVertex(1961946450500000000, Math.mulDiv(2000, Constants.Q96, 10000).toUint128()) // v9 (100%, 20%)
+            // (aX248, bX96) = (5763572808880626331515210718947783038064955043708290426, 0)
+            IMarketManager.PriceVertex(39238929010000000, Math.mulDiv(5, Constants.Q96, 10000).toUint128()), // v1 (2%, 0.05%) 39614081257132168796771975
+            // (aX248, bX96) = (11527145617761252663030421437895566076129910087416580852, -39614081257132168796771975)
+            IMarketManager.PriceVertex(58858393515000000, Math.mulDiv(10, Constants.Q96, 10000).toUint128()), // v2 (3%, 0.1%) 79228162514264337593543950
+            // (aX248, bX96) = (11527145617761252663030421437895566076129910087416580852, -39614081257132168796771975)
+            IMarketManager.PriceVertex(78477858020000000, Math.mulDiv(15, Constants.Q96, 10000).toUint128()), // v3 (4%, 0.15%) 118842243771396506390315925
+            // (aX248, bX96) = (11527145617761252663030421437895566076129910087416580852, -39614081257132168796771975)
+            IMarketManager.PriceVertex(98097322525000000, Math.mulDiv(20, Constants.Q96, 10000).toUint128()), // v4 (5%, 0.2%) 158456325028528675187087900
+            // (aX248, bX96) = (36886865976836008521697348775857450355133685666942299822, -475368975085586025561263703)
+            IMarketManager.PriceVertex(196194645050000000, Math.mulDiv(100, Constants.Q96, 10000).toUint128()), // v5 (10%, 1%) 792281625142643375935439503
+            // (aX248, bX96) = (23054291235522505326060842963086951608018806868437782252, 0)
+            IMarketManager.PriceVertex(392389290100000000, Math.mulDiv(200, Constants.Q96, 10000).toUint128()), // v6 (20%, 2%) 1584563250285286751870879006
+            // (aX248, bX96) = (23054291235522505326060842972786487103103138723282740090, 0)
+            IMarketManager.PriceVertex(980973225250000000, Math.mulDiv(500, Constants.Q96, 10000).toUint128()), // v7 (50%, 5%) 3961408125713216879677197516
+            // (aX248, bX96) = (57635728088806263315152107436815985505300012735629329144, -5942112188569825319515796276)
+            IMarketManager.PriceVertex(1373362515350000000, Math.mulDiv(1000, Constants.Q96, 10000).toUint128()), // v8 (70%, 10%) 7922816251426433759354395033
+            // (aX248, bX96) = (76847637451741684420202809915754647340400016980839105526, -10563755001901911679139193379)
+            IMarketManager.PriceVertex(1961946450500000000, Math.mulDiv(2000, Constants.Q96, 10000).toUint128()) // v9 (100%, 20%) 15845632502852867518708790067
         ];
     }
 
@@ -1330,10 +1339,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 38138929010007018, // move to somewhere between v0 and v1
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158494828593007491044,
+                tradePriceX96Expect: 158494828592998474496,
                 netSizeExpect: 38138929010007018,
                 bufferSizeExpect: 0,
-                prX96Expect: 38503564478815856257104888,
+                prX96Expect: 38503564469799308458487564,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 1
             }),
@@ -1343,10 +1352,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 19719274506993885, // between v1 and v2
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158570988681632806283,
+                tradePriceX96Expect: 158570988681606472471,
                 netSizeExpect: 57858203517000903,
                 bufferSizeExpect: 0,
-                prX96Expect: 77208657481062130813881121,
+                prX96Expect: 77208657453705240041395759,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 2
             }),
@@ -1356,10 +1365,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 17619643503099099, // between v2 and v3
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158646318543284276592,
+                tradePriceX96Expect: 158646318543249061583,
                 netSizeExpect: 75477847020100002,
                 bufferSizeExpect: 0,
-                prX96Expect: 112784857302369080024670889,
+                prX96Expect: 112784857266681155216142940,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 3
             }),
@@ -1369,10 +1378,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 15619476506910376, // between v3 and v4
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158713432362868030175,
+                tradePriceX96Expect: 158713432362826375432,
                 netSizeExpect: 91097323527010378,
                 bufferSizeExpect: 0,
-                prX96Expect: 144322477074092316309449321,
+                prX96Expect: 144322477031019089387325820,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 4
             }),
@@ -1382,10 +1391,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 95097321523069629, // between v4 and v5
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 159299511605384935577,
+                tradePriceX96Expect: 159299511605362266026,
                 netSizeExpect: 186194645050080007,
                 bufferSizeExpect: 0,
-                prX96Expect: 727669739355339088803536364,
+                prX96Expect: 727669739334290763645858707,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 5
             }),
@@ -1395,10 +1404,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 1665751805449927001, // between v8 and v9
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 169907970739997428505,
+                tradePriceX96Expect: 169907970739738972461,
                 netSizeExpect: 1851946450500007008,
                 bufferSizeExpect: 0,
-                prX96Expect: 14364943453965506226214090973,
+                prX96Expect: 14364943453066367938211883505,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 9
             })
@@ -1443,10 +1452,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 19719274506993885,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158570988681632806281,
-                netSizeExpect: 38138929010007018,
+                tradePriceX96Expect: 158570988681606472469,
+                netSizeExpect: 38138929010007018, // v0..v1
                 bufferSizeExpect: 0,
-                prX96Expect: 38503564478815856257104888,
+                prX96Expect: 38503564469799308458487564,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 1
             }),
@@ -1456,10 +1465,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 17619643503099099,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158646318543284276590,
-                netSizeExpect: 57858203517000903,
+                tradePriceX96Expect: 158646318543249061581,
+                netSizeExpect: 57858203517000903, // v1..v2
                 bufferSizeExpect: 0,
-                prX96Expect: 77208657481062130813881121,
+                prX96Expect: 77208657453705240041395759,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 2
             }),
@@ -1469,10 +1478,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 15619476506910376,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158713432362868030173,
-                netSizeExpect: 75477847020100002,
+                tradePriceX96Expect: 158713432362826375430,
+                netSizeExpect: 75477847020100002, // v2..v3
                 bufferSizeExpect: 0,
-                prX96Expect: 112784857302369080024670889,
+                prX96Expect: 112784857266681155216142940,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 3
             }),
@@ -1482,10 +1491,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 95097321523069629,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 159299511605384935575,
-                netSizeExpect: 91097323527010378,
+                tradePriceX96Expect: 159299511605362266024,
+                netSizeExpect: 91097323527010378, // v3..v4
                 bufferSizeExpect: 0,
-                prX96Expect: 144322477074092316309449321,
+                prX96Expect: 144322477031019089387325820,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 4
             }),
@@ -1495,10 +1504,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 1665751805449927001,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 169907970739997428503,
-                netSizeExpect: 186194645050080007,
+                tradePriceX96Expect: 169907970739738972459,
+                netSizeExpect: 186194645050080007, // v4..v5
                 bufferSizeExpect: 0,
-                prX96Expect: 727669739355339088803536364,
+                prX96Expect: 727669739334290763645858707,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 5
             })
@@ -1533,10 +1542,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 38138929010007018, // move to somewhere between v0 and v1
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158417821464049859330,
+                tradePriceX96Expect: 158417821464058875878,
                 netSizeExpect: 38138929010007018,
                 bufferSizeExpect: 0,
-                prX96Expect: 38503564478815856257104888,
+                prX96Expect: 38503564469799308458487564,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 1
             }),
@@ -1546,10 +1555,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 19719274506993885, // between v1 and v2
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158341661375424544091,
+                tradePriceX96Expect: 158341661375450877903,
                 netSizeExpect: 57858203517000903,
                 bufferSizeExpect: 0,
-                prX96Expect: 77208657481062130813881121,
+                prX96Expect: 77208657453705240041395759,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 2
             }),
@@ -1559,10 +1568,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 17619643503099099, // between v2 and v3
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158266331513773073782,
+                tradePriceX96Expect: 158266331513808288791,
                 netSizeExpect: 75477847020100002,
                 bufferSizeExpect: 0,
-                prX96Expect: 112784857302369080024670889,
+                prX96Expect: 112784857266681155216142940,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 3
             }),
@@ -1572,10 +1581,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 15619476506910376, // between v3 and v4
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158199217694189320199,
+                tradePriceX96Expect: 158199217694230974942,
                 netSizeExpect: 91097323527010378,
                 bufferSizeExpect: 0,
-                prX96Expect: 144322477074092316309449321,
+                prX96Expect: 144322477031019089387325820,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 4
             }),
@@ -1585,10 +1594,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 95097321523069629, // between v4 and v5
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 157613138451672414797,
+                tradePriceX96Expect: 157613138451695084348,
                 netSizeExpect: 186194645050080007,
                 bufferSizeExpect: 0,
-                prX96Expect: 727669739355339088803536364,
+                prX96Expect: 727669739334290763645858707,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 5
             }),
@@ -1598,10 +1607,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 1665751805449927001, // between v8 and v9
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 147004679317059921869,
+                tradePriceX96Expect: 147004679317318377913,
                 netSizeExpect: 1851946450500007008,
                 bufferSizeExpect: 0,
-                prX96Expect: 14364943453965506226214090973,
+                prX96Expect: 14364943453066367938211883505,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 9
             })
@@ -1646,10 +1655,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 19719274506993885,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158341661375424544093,
-                netSizeExpect: 38138929010007018,
+                tradePriceX96Expect: 158341661375450877905,
+                netSizeExpect: 38138929010007018, // v0..v1
                 bufferSizeExpect: 0,
-                prX96Expect: 38503564478815856257104888,
+                prX96Expect: 38503564469799308458487564,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 1
             }),
@@ -1659,10 +1668,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 17619643503099099,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158266331513773073784,
-                netSizeExpect: 57858203517000903,
+                tradePriceX96Expect: 158266331513808288793,
+                netSizeExpect: 57858203517000903, // v1..v2
                 bufferSizeExpect: 0,
-                prX96Expect: 77208657481062130813881121,
+                prX96Expect: 77208657453705240041395759,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 2
             }),
@@ -1672,10 +1681,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 15619476506910376,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158199217694189320201,
-                netSizeExpect: 75477847020100002,
+                tradePriceX96Expect: 158199217694230974944,
+                netSizeExpect: 75477847020100002, // v2..v3
                 bufferSizeExpect: 0,
-                prX96Expect: 112784857302369080024670889,
+                prX96Expect: 112784857266681155216142940,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 3
             }),
@@ -1685,10 +1694,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 95097321523069629,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 157613138451672414799,
-                netSizeExpect: 91097323527010378,
+                tradePriceX96Expect: 157613138451695084350,
+                netSizeExpect: 91097323527010378, // v3..v4
                 bufferSizeExpect: 0,
-                prX96Expect: 144322477074092316309449321,
+                prX96Expect: 144322477031019089387325820,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 4
             }),
@@ -1698,10 +1707,10 @@ contract PriceUtilTest is Test {
                 sizeDelta: 1665751805449927001,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 147004679317059921871,
-                netSizeExpect: 186194645050080007,
+                tradePriceX96Expect: 147004679317318377915,
+                netSizeExpect: 186194645050080007, // v4..v5
                 bufferSizeExpect: 0,
-                prX96Expect: 727669739355339088803536364,
+                prX96Expect: 727669739334290763645858707,
                 pendingVertexIndexExpect: 0,
                 currentVertexIndexExpect: 5
             })
