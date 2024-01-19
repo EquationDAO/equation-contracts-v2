@@ -2327,9 +2327,7 @@ describe("MarketManager", () => {
 
             await expect(
                 marketManager.connect(other).govUseLiquidationFund(ETHMarketDescriptor.target, account.address, 1n),
-            )
-                .to.revertedWithCustomError(marketManager, "InvalidCaller")
-                .withArgs(gov.address);
+            ).to.revertedWithCustomError(marketManager, "Forbidden");
         });
 
         it("should update global liquidation fund and transfer liquidation fund used by gov out to receiver", async () => {

@@ -121,7 +121,7 @@ contract MarketManager is MarketManagerStates {
         address _receiver,
         uint128 _liquidationFundDelta
     ) external override nonReentrantForMarket(_market) {
-        if (msg.sender != gov()) revert IMarketErrors.InvalidCaller(gov());
+        _onlyGov();
 
         State storage state = marketStates[_market];
         state.govUseLiquidationFund(_market, _liquidationFundDelta, _receiver);
