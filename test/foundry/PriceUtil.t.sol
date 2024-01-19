@@ -1857,7 +1857,7 @@ contract PriceUtilTest is Test {
             2 * Constants.Q96 * Constants.Q152,
             1 * int256(Constants.Q96)
         );
-        // global short && a > 0 && b > 0 (aX96 round up, bX96 round down)
+        // global short && a > 0 && b > 0 (aX248 round up, bX96 round down)
         items[6] = CalculateAX248AndBX96Params(
             SHORT,
             IMarketManager.PriceVertex(1, uint128(1 * Constants.Q96)),
@@ -1865,7 +1865,7 @@ contract PriceUtilTest is Test {
             301541899055510925582216106791555096444282638558694587560154798172096779606, // (2 * Constants.Q96-1) * Constants.Q152 / 3 + 1
             26409387504754779197847983445 // (2 * Constants.Q96 + 1) / 3
         );
-        // global long && a > 0 && b < 0 (aX96 round up, bX96 round down)
+        // global long && a > 0 && b < 0 (aX248 round up, bX96 round down)
         items[7] = CalculateAX248AndBX96Params(
             LONG,
             IMarketManager.PriceVertex(1, uint128(1 * Constants.Q96)),
@@ -2077,8 +2077,8 @@ contract PriceUtilTest is Test {
     }
 
     function test_CalculatePremiumRateAfterX96() public {
-        // aX96 = 23768448755, bX96 = ±7922816251426433759354395034(global side: LONG(+) / SHORT(-))
-        uint256 length = 8;
+        // aX248 = 135693854574979916511997248058197940169715531184894164759, bX96 = ±7922816251426433759354395034(global side: LONG(+) / SHORT(-))
+        uint256 length = 12;
         CalculatePremiumRateAfterX96Params[] memory items = new CalculatePremiumRateAfterX96Params[](length);
         // long && reached && improveBalance (sizeUsed = sizeCurrent - to.size)
         items[0] = CalculatePremiumRateAfterX96Params({
@@ -2168,6 +2168,54 @@ contract PriceUtilTest is Test {
             sizeUsed: 0.5e18,
             premiumRateAfterX96: 32483546630848378413353019638
         });
+        // premiumRate: [0.6%, 10%], sizeToReach: 1
+        items[8] = CalculatePremiumRateAfterX96Params({
+            // (aX248, bX96) = (42517407766827040507092471054543540554711450212262738584, -6972078301255261708231867629)
+            from: IMarketManager.PriceVertex(1e18, uint128((3 * Constants.Q96) / 500)), // 475368975085586025561263702
+            to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 10)), // 7922816251426433759354395033
+            side: SHORT,
+            improveBalance: false,
+            sizeCurrent: 1.2e18,
+            reached: false,
+            sizeUsed: 0.8e18 - 1,
+            premiumRateAfterX96: 7922816251426433751906947757 // 0.0999999999999999999059999999967
+        });
+        // premiumRate: [1.2%, 20%], sizeToReach: 1
+        items[9] = CalculatePremiumRateAfterX96Params({
+            // (aX248, bX96) = (85034815533654081014184942114796071880246739948758621046, -13944156602510523416463735259)
+            from: IMarketManager.PriceVertex(1e18, uint128((3 * Constants.Q96) / 250)), // 950737950171172051122527404
+            to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 5)), // 15845632502852867518708790067
+            side: SHORT,
+            improveBalance: false,
+            sizeCurrent: 1.2e18,
+            reached: false,
+            sizeUsed: 0.8e18 - 1,
+            premiumRateAfterX96: 15845632502852867503813895515 // 0.199999999999999999812000000006
+        });
+        // premiumRate: [3%, 50%], sizeToReach: 1
+        items[10] = CalculatePremiumRateAfterX96Params({
+            // (aX248, bX96) = (212587038834135202535462355289844675086028769634013124552, -34860391506276308541159338148)
+            from: IMarketManager.PriceVertex(1e18, uint128((3 * Constants.Q96) / 100)), // 2376844875427930127806318510
+            to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96 / 2)), // 39614081257132168796771975168
+            side: SHORT,
+            improveBalance: false,
+            sizeCurrent: 1.2e18,
+            reached: false,
+            sizeUsed: 0.8e18 - 1,
+            premiumRateAfterX96: 39614081257132168759534738787 // 0.499999999999999999530000000009
+        });
+        // premiumRate: [50%, 100%], sizeToReach: 1
+        items[11] = CalculatePremiumRateAfterX96Params({
+            // (aX248, bX96) = (226156424291633194186662080095093570025917938800079226640, 0)
+            from: IMarketManager.PriceVertex(1e18, uint128(Constants.Q96 / 2)), // 39614081257132168796771975168
+            to: IMarketManager.PriceVertex(2e18, uint128(Constants.Q96)), // 79228162514264337593543950336
+            side: SHORT,
+            improveBalance: false,
+            sizeCurrent: 1.2e18,
+            reached: false,
+            sizeUsed: 0.8e18 - 1,
+            premiumRateAfterX96: 79228162514264337553929869079 // 0.999999999999999999500000000002
+        });
 
         for (uint256 i = 0; i < length; i++) {
             CalculatePremiumRateAfterX96Params memory item = items[i];
@@ -2205,7 +2253,7 @@ contract PriceUtilTest is Test {
     }
 
     function test_SimulateMove() public {
-        // aX96 = 6602346877, bX96 = ±13204693752377389598923991723 (global side: LONG(-) / SHORT(+))
+        // aX248 = 37692737381938865697777013347279264747378376625268823147, bX96 = ±13204693752377389598923991723 (global side: LONG(-) / SHORT(+))
         uint256 length = 12;
         SimulateMoveParams[] memory items = new SimulateMoveParams[](length);
         // short && improveBalance && sizeLeft > sizeCurrent - sizeTo
