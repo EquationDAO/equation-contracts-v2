@@ -169,6 +169,39 @@ contract PriceUtilTest is Test {
         );
         assertEq(tradePriceX96, 165543284165429620185); // trade price is down by 10%
         assertEq(globalPosition.liquidationBufferNetSize | globalPosition.netSize, 0);
+
+        // Test that the trader can save the negative trade price by opening more size
+        // Shorts to the top (v9)
+        currentIndexPriceX96 = Math.mulDiv(2000, Constants.Q96, 1e12).toUint160();
+        sizeDelta = priceState.priceVertices[9].size;
+        expectEmitGlobalLiquidityPositionChangedEvent(market, LONG, sizeDelta, 0);
+        expectEmitBasisIndexPriceX96ChangedEvent(currentIndexPriceX96);
+        expectEmitPremiumChangedEvent(priceState.priceVertices[9].premiumRateX96);
+        (tradePriceX96, priceState, globalPosition) = priceUtil.updatePriceState(
+            globalPosition,
+            priceState,
+            packUpdatePriceStateParam(market, SHORT, sizeDelta, currentIndexPriceX96, liquidationVertexIndex, false)
+        );
+        assertEq(tradePriceX96, 146993198335152339501);
+        assertEq(globalPosition.netSize, priceState.priceVertices[9].size);
+        assertEq(priceState.currentVertexIndex, 9);
+
+        // Next step will move the price to v8
+        // To ensure that the trade price x96 calculation result is -1, let the index price drop
+        currentIndexPriceX96 = 23768448754279301277;
+        sizeDelta = priceState.priceVertices[9].size - priceState.priceVertices[8].size;
+        vm.expectRevert(abi.encodeWithSelector(IMarketErrors.InvalidTradePrice.selector, -int256(uint256(sizeDelta))));
+        priceUtil.updatePriceState(
+            globalPosition,
+            priceState,
+            packUpdatePriceStateParam(market, LONG, sizeDelta, currentIndexPriceX96, liquidationVertexIndex, false)
+        );
+        // If price keeps this low, trader can long more size, the trade price will be valid again
+        priceUtil.updatePriceState(
+            globalPosition,
+            priceState,
+            packUpdatePriceStateParam(market, LONG, sizeDelta + 1, currentIndexPriceX96, liquidationVertexIndex, false)
+        );
     }
 
     // Test update price state, starting from opening long positions, each op moves pr exactly on a certain vertex
