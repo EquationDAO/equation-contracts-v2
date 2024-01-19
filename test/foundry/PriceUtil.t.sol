@@ -2228,14 +2228,14 @@ contract PriceUtilTest is Test {
             premiumRateAfterX96: 79228162514264337593543950335
         });
         items[13] = CalculatePremiumRateAfterX96Params({
-            // (aX248, bX96) = (226156424291633194186662080095319726450209572, 39614081257132168796771975167)
+            // (aX248, bX96) = (664613997892457936451903530140172289, 39614081257132168796771975167)
             from: IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 2)), // 39614081257132168796771975168
             to: IMarketManager.PriceVertex(type(uint128).max, uint128(Constants.Q96)), // 79228162514264337593543950336
             side: SHORT,
             improveBalance: false,
             sizeCurrent: 1,
             reached: false,
-            sizeUsed: type(uint128).max - 2,
+            sizeUsed: type(uint128).max - 3,
             premiumRateAfterX96: 79228162514264337593543950336
         });
 
