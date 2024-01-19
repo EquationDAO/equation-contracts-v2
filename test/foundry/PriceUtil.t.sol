@@ -2216,6 +2216,7 @@ contract PriceUtilTest is Test {
             sizeUsed: 50_000_000_000e18 - 2,
             premiumRateAfterX96: 79228162514264337593543950336
         });
+        // sizeToReach: 1, premiumRateAfter < 1
         items[12] = CalculatePremiumRateAfterX96Params({
             // (aX248, bX96) = (9046256971665327767466483203803742801036717553, 0)
             from: IMarketManager.PriceVertex(0, 0),
@@ -2227,6 +2228,7 @@ contract PriceUtilTest is Test {
             sizeUsed: 50_000_000_000e18 - 1,
             premiumRateAfterX96: 79228162514264337593543950335
         });
+        // sizeToReach: 1, premiumRateAfter = 1
         items[13] = CalculatePremiumRateAfterX96Params({
             // (aX248, bX96) = (664613997892457936451903530140172289, 39614081257132168796771975167)
             from: IMarketManager.PriceVertex(1, uint128(Constants.Q96 / 2)), // 39614081257132168796771975168
