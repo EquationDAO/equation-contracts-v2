@@ -55,6 +55,8 @@ contract FarmRewardDistributor is Governable, ReentrancyGuard {
         EFC = _distributorV2.EFC();
         feeDistributor = _distributorV2.feeDistributor();
         marketIndexer = _marketIndexer;
+
+        token.approve(address(feeDistributor), type(uint256).max);
     }
 
     /// @notice Set whether the address of the reward collector is enabled or disabled
