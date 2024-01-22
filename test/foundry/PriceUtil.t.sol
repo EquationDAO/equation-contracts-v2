@@ -1472,7 +1472,7 @@ contract PriceUtilTest is Test {
                 sizeDelta: 38138929010007018,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: SHORT,
-                tradePriceX96Expect: 158494828593007491042,
+                tradePriceX96Expect: 158494828592998474495,
                 netSizeExpect: 0,
                 bufferSizeExpect: 0,
                 prX96Expect: 0,
@@ -1546,7 +1546,7 @@ contract PriceUtilTest is Test {
             })
         ];
 
-        for (uint i = shortCases.length - 1; i > 0; --i) {
+        for (uint i = shortCases.length - 1; i >= 0; --i) {
             (tradePriceX96, priceState, globalPosition) = priceUtil.updatePriceState(
                 globalPosition,
                 priceState,
@@ -1560,6 +1560,7 @@ contract PriceUtilTest is Test {
                 )
             );
             checkResult(shortCases[i], tradePriceX96);
+            if (i == 0) break;
         }
     }
 
@@ -1675,7 +1676,7 @@ contract PriceUtilTest is Test {
                 sizeDelta: 38138929010007018,
                 indexPriceX96: currentIndexPriceX96,
                 globalSideExpect: LONG,
-                tradePriceX96Expect: 158417821464049859332,
+                tradePriceX96Expect: 158417821464058875879,
                 netSizeExpect: 0,
                 bufferSizeExpect: 0,
                 prX96Expect: 0,
@@ -1749,7 +1750,7 @@ contract PriceUtilTest is Test {
             })
         ];
 
-        for (uint i = longCases.length - 1; i > 0; --i) {
+        for (uint i = longCases.length - 1; i >= 0; --i) {
             (tradePriceX96, priceState, globalPosition) = priceUtil.updatePriceState(
                 globalPosition,
                 priceState,
@@ -1763,6 +1764,7 @@ contract PriceUtilTest is Test {
                 )
             );
             checkResult(longCases[i], tradePriceX96);
+            if (i == 0) break;
         }
     }
 
