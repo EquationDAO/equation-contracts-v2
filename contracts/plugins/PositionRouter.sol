@@ -207,28 +207,13 @@ contract PositionRouter is IPositionRouter, Governable, ReentrancyGuard {
     ) external payable override nonReentrant returns (uint128 index) {
         if (msg.value < minExecutionFee) revert InsufficientExecutionFee(msg.value, minExecutionFee);
 
-        index = decreaseLiquidityPositionIndexNext++;
-        decreaseLiquidityPositionRequests[index] = DecreaseLiquidityPositionRequest({
-            account: msg.sender,
-            market: _market,
-            marginDelta: _marginDelta,
-            liquidityDelta: _liquidityDelta,
-            acceptableMinMargin: _acceptableMinMargin,
-            executionFee: msg.value,
-            blockNumber: block.number.toUint96(),
-            blockTime: block.timestamp.toUint64(),
-            receiver: _receiver
-        });
-
-        emit DecreaseLiquidityPositionCreated(
-            msg.sender,
+        index = _createDecreaseLiquidityPosition(
             _market,
             _marginDelta,
             _liquidityDelta,
             _acceptableMinMargin,
             _receiver,
-            msg.value,
-            index
+            msg.value
         );
     }
 
