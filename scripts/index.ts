@@ -183,6 +183,7 @@ async function main() {
 
     // initialize plugins
     await router.registerLiquidator(liquidatorAddr);
+    await router.registerPlugin(liquidator); // liquidator is also a plugin
     await router.registerPlugin(orderBookAddr);
     await router.registerPlugin(positionRouterAddr);
     await router.registerPlugin(rewardCollectorAddr);
