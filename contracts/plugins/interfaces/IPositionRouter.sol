@@ -5,6 +5,13 @@ import {Side} from "../../types/Side.sol";
 import "../../core/interfaces/IMarketDescriptor.sol";
 
 interface IPositionRouter {
+    enum RequestType {
+        IncreaseLiquidityPosition,
+        DecreaseLiquidityPosition,
+        IncreasePosition,
+        DecreasePosition
+    }
+
     struct IncreaseLiquidityPositionRequest {
         address account;
         IMarketDescriptor market;
@@ -192,6 +199,12 @@ interface IPositionRouter {
     /// @param index Index of the executed decrease position request
     /// @param executionFeeReceiver Receiver of the request execution fee
     event DecreasePositionExecuted(uint128 indexed index, address payable executionFeeReceiver);
+
+    /// @notice Emitted when requests execution reverted
+    /// @param reqType Request type
+    /// @param index Index of the failed request
+    /// @param shortenedReason The error selector for the failure
+    event ExecuteFailed(RequestType indexed reqType, uint128 indexed index, bytes4 shortenedReason);
 
     /// @notice Execution fee is insufficient
     /// @param available The available execution fee amount
