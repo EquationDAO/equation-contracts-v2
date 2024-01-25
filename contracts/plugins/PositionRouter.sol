@@ -185,7 +185,10 @@ contract PositionRouter is IPositionRouter, Governable, ReentrancyGuard {
         while (index < _endIndex) {
             try this.executeIncreaseLiquidityPosition(index, _executionFeeReceiver) returns (bool _executed) {
                 if (!_executed) break;
-            } catch {
+            } catch (bytes memory reason) {
+                bytes4 errorTypeSelector = _decodeShortenedReason(reason);
+                emit ExecuteFailed(RequestType.IncreaseLiquidityPosition, index, errorTypeSelector);
+
                 try this.cancelIncreaseLiquidityPosition(index, _executionFeeReceiver) returns (bool _cancelled) {
                     if (!_cancelled) break;
                 } catch {}
@@ -311,7 +314,10 @@ contract PositionRouter is IPositionRouter, Governable, ReentrancyGuard {
         while (index < _endIndex) {
             try this.executeDecreaseLiquidityPosition(index, _executionFeeReceiver) returns (bool _executed) {
                 if (!_executed) break;
-            } catch {
+            } catch (bytes memory reason) {
+                bytes4 errorTypeSelector = _decodeShortenedReason(reason);
+                emit ExecuteFailed(RequestType.DecreaseLiquidityPosition, index, errorTypeSelector);
+
                 try this.cancelDecreaseLiquidityPosition(index, _executionFeeReceiver) returns (bool _cancelled) {
                     if (!_cancelled) break;
                 } catch {}
@@ -445,7 +451,10 @@ contract PositionRouter is IPositionRouter, Governable, ReentrancyGuard {
         while (index < _endIndex) {
             try this.executeIncreasePosition(index, _executionFeeReceiver) returns (bool _executed) {
                 if (!_executed) break;
-            } catch {
+            } catch (bytes memory reason) {
+                bytes4 errorTypeSelector = _decodeShortenedReason(reason);
+                emit ExecuteFailed(RequestType.IncreasePosition, index, errorTypeSelector);
+
                 try this.cancelIncreasePosition(index, _executionFeeReceiver) returns (bool _cancelled) {
                     if (!_cancelled) break;
                 } catch {}
@@ -581,7 +590,10 @@ contract PositionRouter is IPositionRouter, Governable, ReentrancyGuard {
         while (index < _endIndex) {
             try this.executeDecreasePosition(index, _executionFeeReceiver) returns (bool _executed) {
                 if (!_executed) break;
-            } catch {
+            } catch (bytes memory reason) {
+                bytes4 errorTypeSelector = _decodeShortenedReason(reason);
+                emit ExecuteFailed(RequestType.DecreasePosition, index, errorTypeSelector);
+
                 try this.cancelDecreasePosition(index, _executionFeeReceiver) returns (bool _cancelled) {
                     if (!_cancelled) break;
                 } catch {}
@@ -712,6 +724,10 @@ contract PositionRouter is IPositionRouter, Governable, ReentrancyGuard {
 
     function _validateMargin(uint128 margin, uint128 _acceptableMinMargin) internal pure {
         if (margin < _acceptableMinMargin) revert InvalidMargin(margin, _acceptableMinMargin);
+    }
+
+    function _decodeShortenedReason(bytes memory _reason) internal pure virtual returns (bytes4) {
+        return bytes4(_reason);
     }
 
     function _transferOutETH(uint256 _amountOut, address payable _receiver) private {
