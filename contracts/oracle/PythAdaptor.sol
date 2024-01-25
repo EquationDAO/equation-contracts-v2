@@ -29,9 +29,16 @@ contract PythAdaptor is IPythAdaptor, Governable {
     // uint256 will be able to contain 4 (4 * (24 + 24 + 16) = 256 bits) entries
     uint8 public constant MAX_PRICE_PER_WORD = 4;
 
+    uint16 private constant STABLE_ASSET_INDEX = 65535;
+
     modifier onlyUpdater() {
         if (!updaters[msg.sender]) revert Forbidden();
         _;
+    }
+
+    constructor(bytes32 _stableAssetId) {
+        assetsIndexes[_stableAssetId] = STABLE_ASSET_INDEX;
+        indexAssets[STABLE_ASSET_INDEX] = _stableAssetId;
     }
 
     /// @inheritdoc IPythAdaptor
@@ -50,7 +57,8 @@ contract PythAdaptor is IPythAdaptor, Governable {
                 if (assetIndex == 0) break;
                 int24 priceTick = int24(price.unpackUint24(j * 64 + 16));
                 uint24 pricePublishTimeDiff = price.unpackUint24(j * 64 + 40);
-                if (assetIdIndex > maxAssetsIndex) revert InvalidAssetIndex(assetIdIndex);
+                if (assetIdIndex > maxAssetsIndex && assetIdIndex != STABLE_ASSET_INDEX)
+                    revert InvalidAssetIndex(assetIdIndex);
                 bytes32 assetId = indexAssets[assetIdIndex];
                 priceData[assetId] = CompressedPrice({
                     tick: priceTick,

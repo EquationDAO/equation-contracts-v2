@@ -18,6 +18,7 @@ describe("PythAdaptor", () => {
     const OPAssetId = "0x385f64d993f7b77d8182ed5003d97c60aa3361f3cecfe711544d2d59165e9bdf";
     const MATICAssetId = "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52";
     const AVAXAssetId = "0x93da3352f9f1d105fdfe4971cfa80e9dd777bfc5d0f683ebb6e1294b92137bb7";
+    const USDTAssetId = "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b";
 
     const assetIds = [ETHAssetId, BTCAssetId, SOLAssetId, ARBAssetId, OPAssetId, MATICAssetId, AVAXAssetId];
     const assetIdsPart1 = [ETHAssetId, BTCAssetId, SOLAssetId];
@@ -29,7 +30,7 @@ describe("PythAdaptor", () => {
         const PythAdaptor = await ethers.getContractFactory("PythAdaptor");
         const TickMathTest = await ethers.getContractFactory("TickMathTest");
         const Helper = await ethers.getContractFactory("PythAdaptorHelper");
-        const pythAdaptor = await PythAdaptor.deploy();
+        const pythAdaptor = await PythAdaptor.deploy(USDTAssetId);
         const helper = await Helper.deploy(pythAdaptor);
         await pythAdaptor.assignAssetsIndexes(assetIdsPart1);
         await pythAdaptor.setUpdater(owner, true);
@@ -133,8 +134,8 @@ describe("PythAdaptor", () => {
                 pythAdaptor.updatePriceFeeds(
                     res,
                     minTimestamp,
-                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52"
-                )
+                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
+                ),
             )
                 .to.emit(pythAdaptor, "LogVaas")
                 .withArgs("0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52");
@@ -208,8 +209,8 @@ describe("PythAdaptor", () => {
                 helper.updatePriceFeeds(
                     res,
                     minTimestamp,
-                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52"
-                )
+                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
+                ),
             )
                 .to.emit(pythAdaptor, "LogVaas")
                 .withArgs("0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52");
@@ -255,8 +256,8 @@ describe("PythAdaptor", () => {
                 pythAdaptor.updatePriceFeeds(
                     res,
                     minTimestamp,
-                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52"
-                )
+                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
+                ),
             )
                 .to.revertedWithCustomError(pythAdaptor, "InvalidAssetIndex")
                 .withArgs(4);
@@ -293,8 +294,8 @@ describe("PythAdaptor", () => {
                 pythAdaptor.updatePriceFeeds(
                     res,
                     minTimestamp,
-                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52"
-                )
+                    "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
+                ),
             )
                 .to.emit(pythAdaptor, "LogVaas")
                 .withArgs("0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52");
@@ -303,7 +304,7 @@ describe("PythAdaptor", () => {
                 if (i == 2) {
                     await expect(pythAdaptor.getPriceUnsafe(assetIdsPart1[i])).to.revertedWithCustomError(
                         pythAdaptor,
-                        "SafeCastOverflowedIntDowncast"
+                        "SafeCastOverflowedIntDowncast",
                     );
                     continue;
                 }
