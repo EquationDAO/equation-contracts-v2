@@ -12,9 +12,6 @@ async function main() {
 
     const marketManager = await ethers.getContractAt("MarketManager", document.deployments.MarketManager);
     for (let item of document.deployments.registerMarkets) {
-        if (item.name !== "1000BONK") {
-            continue;
-        }
         const priceCfg = await marketManager.marketPriceConfigs(item.market);
         const vertices = [];
         for (let i = 0; i < priceCfg.vertices.length - 1; i++) {

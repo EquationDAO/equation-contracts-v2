@@ -42,7 +42,7 @@ async function main() {
     await router.registerPlugin(await rewardCollector.getAddress());
 
     const routerV1 = await ethers.getContractAt("PluginManager", network.routerV1);
-    await routerV1.connect(contractsV1Gov).registerPlugin(await farmRewardDistributor.getAddress());
+    await routerV1.connect(contractsV1Gov).registerPlugin(await rewardCollector.getAddress());
     const farmRewardDistributorV2 = await ethers.getContractAt(
         "FarmRewardDistributor",
         network.farmRewardDistributorV2,
