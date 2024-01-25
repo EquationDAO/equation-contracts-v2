@@ -897,6 +897,7 @@ describe("PositionRouter", function () {
             await positionRouter.updatePositionExecutor(owner.address, true);
 
             const tx = positionRouter.executeIncreaseLiquidityPositions(1n, owner.address);
+            await expect(tx).to.emit(positionRouter, "ExecuteFailed").withArgs(0, 0, "0xf80dbaea");
             await expect(tx).to.changeEtherBalances([positionRouter, owner], ["-3000", "3000"]);
             await expect(tx).to.emit(positionRouter, "IncreaseLiquidityPositionCancelled").withArgs(0, owner.address);
 
@@ -971,12 +972,12 @@ describe("PositionRouter", function () {
             await positionRouter.updatePositionExecutor(owner.address, true);
             const tx = positionRouter.executeIncreaseLiquidityPositions(3n, owner.address);
             await expect(tx)
-                .to.emit(positionRouter, "IncreaseLiquidityPositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouter, "IncreaseLiquidityPositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouter, "IncreaseLiquidityPositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(0, 0, "0xf80dbaea")
+                .to.emit(positionRouter, "IncreaseLiquidityPositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(0, 1, "0xf80dbaea")
+                .to.emit(positionRouter, "IncreaseLiquidityPositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(0, 2, "0xf80dbaea")
+                .to.emit(positionRouter, "IncreaseLiquidityPositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouter.increaseLiquidityPositionIndex()).eq(3n);
         });
@@ -1012,12 +1013,12 @@ describe("PositionRouter", function () {
 
             const tx = positionRouterWithBadRouter.executeIncreaseLiquidityPositions(300n, owner.address);
             await expect(tx)
-                .to.emit(positionRouterWithBadRouter, "IncreaseLiquidityPositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "IncreaseLiquidityPositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "IncreaseLiquidityPositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(0, 0, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "IncreaseLiquidityPositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(0, 1, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "IncreaseLiquidityPositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(0, 2, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "IncreaseLiquidityPositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouterWithBadRouter.increaseLiquidityPositionIndex()).eq(3n);
 
@@ -1094,12 +1095,12 @@ describe("PositionRouter", function () {
             await positionRouter.updatePositionExecutor(owner.address, true);
             const tx = positionRouter.executeDecreaseLiquidityPositions(3n, owner.address);
             await expect(tx)
-                .to.emit(positionRouter, "DecreaseLiquidityPositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouter, "DecreaseLiquidityPositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouter, "DecreaseLiquidityPositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(1, 0, "0xf80dbaea")
+                .to.emit(positionRouter, "DecreaseLiquidityPositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(1, 1, "0xf80dbaea")
+                .to.emit(positionRouter, "DecreaseLiquidityPositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(1, 2, "0xf80dbaea")
+                .to.emit(positionRouter, "DecreaseLiquidityPositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouter.decreaseLiquidityPositionIndex()).eq(3n);
         });
@@ -1133,12 +1134,12 @@ describe("PositionRouter", function () {
 
             const tx = positionRouterWithBadRouter.executeDecreaseLiquidityPositions(3n, owner.address);
             await expect(tx)
-                .to.emit(positionRouterWithBadRouter, "DecreaseLiquidityPositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "DecreaseLiquidityPositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "DecreaseLiquidityPositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(1, 0, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "DecreaseLiquidityPositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(1, 1, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "DecreaseLiquidityPositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(1, 2, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "DecreaseLiquidityPositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouterWithBadRouter.decreaseLiquidityPositionIndex()).eq(3n);
 
@@ -1215,12 +1216,12 @@ describe("PositionRouter", function () {
 
             const tx = positionRouter.executeIncreasePositions(300n, owner.address);
             await expect(tx)
-                .to.emit(positionRouter, "IncreasePositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouter, "IncreasePositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouter, "IncreasePositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(2, 0, "0xf80dbaea")
+                .to.emit(positionRouter, "IncreasePositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(2, 1, "0xf80dbaea")
+                .to.emit(positionRouter, "IncreasePositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(2, 2, "0xf80dbaea")
+                .to.emit(positionRouter, "IncreasePositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouter.increasePositionIndex()).eq(3n);
         });
@@ -1256,12 +1257,12 @@ describe("PositionRouter", function () {
 
             const tx = positionRouterWithBadRouter.executeIncreasePositions(300n, owner.address);
             await expect(tx)
-                .to.emit(positionRouterWithBadRouter, "IncreasePositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "IncreasePositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "IncreasePositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(2, 0, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "IncreasePositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(2, 1, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "IncreasePositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(2, 2, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "IncreasePositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouterWithBadRouter.increasePositionIndex()).eq(3n);
 
@@ -1348,12 +1349,12 @@ describe("PositionRouter", function () {
 
             const tx = positionRouter.executeDecreasePositions(300n, owner.address);
             await expect(tx)
-                .to.emit(positionRouter, "DecreasePositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouter, "DecreasePositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouter, "DecreasePositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(3, 0, "0xf80dbaea")
+                .to.emit(positionRouter, "DecreasePositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(3, 1, "0xf80dbaea")
+                .to.emit(positionRouter, "DecreasePositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouter, "ExecuteFailed").withArgs(3, 2, "0xf80dbaea")
+                .to.emit(positionRouter, "DecreasePositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouter.decreasePositionIndex()).eq(3n);
         });
@@ -1387,12 +1388,12 @@ describe("PositionRouter", function () {
 
             const tx = positionRouterWithBadRouter.executeDecreasePositions(300n, owner.address);
             await expect(tx)
-                .to.emit(positionRouterWithBadRouter, "DecreasePositionCancelled")
-                .withArgs(0n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "DecreasePositionCancelled")
-                .withArgs(1n, owner.address)
-                .to.emit(positionRouterWithBadRouter, "DecreasePositionCancelled")
-                .withArgs(2n, owner.address);
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(3, 0, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "DecreasePositionCancelled").withArgs(0n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(3, 1, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "DecreasePositionCancelled").withArgs(1n, owner.address)
+                .to.emit(positionRouterWithBadRouter, "ExecuteFailed").withArgs(3, 2, "0x00000000")
+                .to.emit(positionRouterWithBadRouter, "DecreasePositionCancelled").withArgs(2n, owner.address);
 
             expect(await positionRouterWithBadRouter.decreasePositionIndex()).eq(3n);
 
