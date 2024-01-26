@@ -238,8 +238,9 @@ library FundingRateUtil {
                 // will be distributed to the trading position and the liquidity position
 
                 // PnLGrowthDelta = (paidSize - receivedSize) / paidSize * (paidSize * price * fundingRate)
-                //                = (paidSize - receivedSize) * price * fundingRate
-                //                = (paidSize - receivedSize) * paidFundingRateGrowthDelta
+                //                  / ((1 << 32) * liquidity)
+                //                = (paidSize - receivedSize) * price * fundingRate / ((1 << 32) * liquidity)
+                //                = (paidSize - receivedSize) * paidFundingRateGrowthDelta / ((1 << 32) * liquidity)
                 int256 unrealizedPnLGrowthDeltaX64;
                 unchecked {
                     unrealizedPnLGrowthDeltaX64 = Math

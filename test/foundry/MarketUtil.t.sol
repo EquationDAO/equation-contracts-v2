@@ -217,18 +217,17 @@ contract MarketUtilTest is Test {
         assertEq(position.previousSPPriceX96, 0);
     }
 
-    function test_settleLiquidityUnrealizedPnL_RevertIf_TotalNetSizeOverflow() public {
+    function test_settleLiquidityUnrealizedPnL_NotRevertIf_TotalNetSizeExceedsMaxUint128() public {
         util.setGlobalLiquidityPosition(
             IMarketLiquidityPosition.GlobalLiquidityPosition({
                 netSize: type(uint128).max,
                 liquidationBufferNetSize: 1,
-                previousSPPriceX96: 0,
+                previousSPPriceX96: 1 << 96,
                 side: Side.wrap(1),
-                liquidity: 0,
+                liquidity: 1000e6,
                 unrealizedPnLGrowthX64: 0
             })
         );
-        vm.expectRevert(stdError.arithmeticError);
         util.settleLiquidityUnrealizedPnL(IPriceFeed(address(priceFeed)), IMarketDescriptor(address(1)));
     }
 
