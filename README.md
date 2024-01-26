@@ -51,6 +51,14 @@ sh ./scripts/deploy.sh -n <network-name> -c <chain-id> -d true -v true
 
 3. View the deployed contracts in the `./deployments` directory.
 
+## Deployment Addresses
+
+The **Equation Contracts V2** project is deployed to the following networks:
+
+| Network          | Chain ID | Contracts                        |
+| ---------------- | -------- | -------------------------------- |
+| Arbitrum Mainnet | 42161    | [View](./deployments/42161.json) |
+
 ## License
 
 The **Equation Contracts V2** project uses a variety of open-source licenses for its codebase. The licensing details for
