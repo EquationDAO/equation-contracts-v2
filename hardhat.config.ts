@@ -46,6 +46,9 @@ const config: HardhatUserConfig = {
             arbitrumOne: `${process.env.ARBISCAN_API_KEY}`,
         },
     },
+    sourcify: {
+        enabled: false,
+    },
 };
 
 export default config;
