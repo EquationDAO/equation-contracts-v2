@@ -23,9 +23,9 @@ export async function resetMarketConfig(chainId: bigint) {
         }
 
         try {
-            // await marketManager.updateMarketBaseConfig(marketAddr, item.marketCfg.baseCfg);
+            await marketManager.updateMarketBaseConfig(marketAddr, item.marketCfg.baseCfg);
             await marketManager.updateMarketFeeRateConfig(marketAddr, item.marketCfg.feeRateCfg);
-            // await marketManager.updateMarketPriceConfig(marketAddr, item.marketCfg.priceCfg);
+            await marketManager.updateMarketPriceConfig(marketAddr, item.marketCfg.priceCfg);
             console.log(`reset market config ${item.name} finished`);
         } catch (e) {
             console.log(`reset market config ${item.name} failed`);
