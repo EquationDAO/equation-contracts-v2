@@ -15,22 +15,22 @@ interface IConfigurable {
 
     struct MarketBaseConfig {
         // ==================== LP Position Configuration ====================
-        /// @notice The minimum entry margin required for each LP positions, for example, 10_000_000 means the minimum
+        /// @notice The minimum entry margin required for per LP position, for example, 10_000_000 means the minimum
         /// entry margin is 10 USD
         uint64 minMarginPerLiquidityPosition;
-        /// @notice The maximum leverage for each LP position, for example, 100 means the maximum leverage is 100 times
+        /// @notice The maximum leverage for per LP position, for example, 100 means the maximum leverage is 100 times
         uint32 maxLeveragePerLiquidityPosition;
-        /// @notice The liquidation fee rate for LP positions,
+        /// @notice The liquidation fee rate for per LP position,
         /// denominated in ten thousandths of a bip (i.e. 1e-8)
         uint32 liquidationFeeRatePerLiquidityPosition;
         // ==================== Trader Position Configuration ==================
-        /// @notice The minimum entry margin required for each trader positions, for example, 10_000_000 means
+        /// @notice The minimum entry margin required for per trader position, for example, 10_000_000 means
         /// the minimum entry margin is 10 USD
         uint64 minMarginPerPosition;
-        /// @notice The maximum leverage for each trader positions, for example, 100 means the maximum leverage
+        /// @notice The maximum leverage for per trader position, for example, 100 means the maximum leverage
         /// is 100 times
         uint32 maxLeveragePerPosition;
-        /// @notice The liquidation fee rate for trader positions,
+        /// @notice The liquidation fee rate for per trader position,
         /// denominated in ten thousandths of a bip (i.e. 1e-8)
         uint32 liquidationFeeRatePerPosition;
         /// @notice The maximum available liquidity used to calculate the maximum size
