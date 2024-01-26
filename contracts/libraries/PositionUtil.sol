@@ -828,7 +828,7 @@ library PositionUtil {
                     referralParentFee
                 );
 
-                liquidityFee -= (referralFee + referralParentFee);
+                liquidityFee -= referralFee + referralParentFee;
             }
         }
     }

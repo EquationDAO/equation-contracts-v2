@@ -200,16 +200,17 @@ library MarketUtil {
         IMarketDescriptor _market
     ) internal {
         IMarketManager.GlobalLiquidityPosition storage globalLiquidityPosition = _state.globalLiquidityPosition;
-        uint128 netSize = globalLiquidityPosition.netSize;
-        uint128 liquidationBufferNetSize = globalLiquidityPosition.liquidationBufferNetSize;
-        uint128 totalNetSize = netSize + liquidationBufferNetSize; // overflow is desired
+        uint256 totalNetSize;
+        unchecked {
+            totalNetSize = uint256(globalLiquidityPosition.netSize) + globalLiquidityPosition.liquidationBufferNetSize;
+        }
         if (totalNetSize == 0) return;
 
         Side side = globalLiquidityPosition.side;
         uint160 spPriceAfterX96 = chooseDecreaseIndexPriceX96(_priceFeed, _market, side);
         int256 priceDeltaX96 = int256(uint256(spPriceAfterX96)) -
             int256(uint256(globalLiquidityPosition.previousSPPriceX96));
-        int256 totalNetSizeInt256 = side.isLong() ? int256(uint256(totalNetSize)) : -int256(uint256(totalNetSize));
+        int256 totalNetSizeInt256 = side.isLong() ? int256(totalNetSize) : -int256(totalNetSize);
         bool isSameSign = (priceDeltaX96 ^ totalNetSizeInt256) >= 0;
         // abs(priceDeltaX96) * totalNetSize / (liquidity * (1 << 32))
         int256 unrealizedPnLGrowthDeltaX64 = Math
