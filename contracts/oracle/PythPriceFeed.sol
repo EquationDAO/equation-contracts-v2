@@ -129,8 +129,8 @@ contract PythPriceFeed is IPythPriceFeed, Governable {
     }
 
     /// @inheritdoc IPythPriceFeed
-    function marketConfig(IMarketDescriptor market) external view override returns (MarketConfig memory) {
-        return marketConfigs0[market];
+    function marketConfigs(IMarketDescriptor _market) external view override returns (MarketConfig memory) {
+        return marketConfigs0[_market];
     }
 
     /// @inheritdoc IPythPriceFeed

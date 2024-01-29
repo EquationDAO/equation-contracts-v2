@@ -225,7 +225,7 @@ describe("PythAdaptor", () => {
                 maxDeviationRatio: 1e4,
                 referencePriceAdjustmentMagnification: 1234,
             });
-            expect(await pythPriceFeed.marketConfig("0x0000000000000000000000000000000000000003")).deep.eq([
+            expect(await pythPriceFeed.marketConfigs("0x0000000000000000000000000000000000000003")).deep.eq([
                 "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
                 "10000",
                 "60",

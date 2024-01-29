@@ -29,7 +29,9 @@ interface IPythPriceFeed {
         /// @notice The timeout for price update transactions.the period (in seconds) that a price feed is considered
         /// valid since its publish time
         uint32 validTimePeriod;
-        /// @notice Some market prices are too low, it is necessary to enlarge the price for better display.
+        /// @notice There are some markets like 1000BONK/USDT in the equation protocol, and its price is 1000 times
+        /// of BONK/USDT. The prices provided by Pyth are the original prices of the trading pairs, so it needs to be
+        /// magnified accordingly when updating the price.
         uint32 referencePriceAdjustmentMagnification;
     }
 
@@ -121,5 +123,5 @@ interface IPythPriceFeed {
     /// @notice Get market configuration for updating price
     /// @param market The market address to query the configuration
     /// @return marketConfig The packed market config data
-    function marketConfig(IMarketDescriptor market) external view returns (MarketConfig memory marketConfig);
+    function marketConfigs(IMarketDescriptor market) external view returns (MarketConfig memory marketConfig);
 }
