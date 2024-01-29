@@ -4,7 +4,7 @@ import {loadFixture, time} from "@nomicfoundation/hardhat-network-helpers";
 import Decimal from "decimal.js";
 import {expect} from "chai";
 import {PythPriceFeed} from "../../typechain-types";
-import {BigNumberish, toBigInt} from "ethers";
+import {toBigInt} from "ethers";
 
 describe("PythAdaptor", () => {
     type PriceData = {
@@ -62,10 +62,20 @@ describe("PythAdaptor", () => {
             "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
         );
 
-        const pythPriceFeed = await PythPriceFee.deploy(pythAdaptor, USDTAssetId, false);
+        const pythPriceFeed = await PythPriceFee.deploy(pythAdaptor, USDTAssetId, 60, false);
         await pythPriceFeed.setUpdater(owner.address, true);
-        await pythPriceFeed.setPythAssetId(BTCMarket, BTCAssetId);
-        await pythPriceFeed.setPythAssetId(ETHMarket, ETHAssetId);
+        await pythPriceFeed.setMarketConfig(BTCMarket, {
+            pythAssetId: BTCAssetId,
+            validTimePeriod: 60,
+            maxDeviationRatio: 1e5,
+            referencePriceAdjustmentMagnification: 0,
+        });
+        await pythPriceFeed.setMarketConfig(ETHMarket, {
+            pythAssetId: ETHAssetId,
+            validTimePeriod: 60,
+            maxDeviationRatio: 1e5,
+            referencePriceAdjustmentMagnification: 0,
+        });
 
         return {pythAdaptor, owner, tickMathTest, helper, pythPriceFeed, notOwner};
     }
@@ -146,7 +156,7 @@ describe("PythAdaptor", () => {
 
         it("the difference between price and refPrice is greater than maxDeviationRatio", async () => {
             const latestBlockTimestamp = await time.latest();
-            const {pythPriceFeed, owner, tickMathTest} = await loadFixture(deployFixture);
+            const {pythPriceFeed} = await loadFixture(deployFixture);
             const maxETHPriceX96 = (toPriceX96(rawPrices[0]) * 12n) / 10n;
             const minBTCPriceX96 = (toPriceX96(rawPrices[1]) * 10n) / 12n;
             await expect(
@@ -173,7 +183,16 @@ describe("PythAdaptor", () => {
         it("referencePriceAdjustmentMagnifications test", async () => {
             const latestBlockTimestamp = await time.latest();
             const {pythPriceFeed} = await loadFixture(deployFixture);
-            await pythPriceFeed.setReferencePriceAdjustmentMagnification(ETHMarket, 100);
+            await expect(
+                pythPriceFeed.setMarketConfig(ETHMarket, {
+                    pythAssetId: ETHAssetId,
+                    validTimePeriod: 60,
+                    maxDeviationRatio: 1e5,
+                    referencePriceAdjustmentMagnification: 100,
+                }),
+            )
+                .emit(pythPriceFeed, "MarketConfigChanged")
+                .withArgs(ETHMarket, [ETHAssetId, "100000", "60", "100"]);
             await expect(
                 pythPriceFeed.setPriceX96s(
                     [
@@ -200,32 +219,21 @@ describe("PythAdaptor", () => {
             const {pythPriceFeed, notOwner} = await loadFixture(deployFixture);
             const maxETHPriceX96 = (toPriceX96(rawPrices[0]) * 12n) / 10n;
             const minBTCPriceX96 = (toPriceX96(rawPrices[1]) * 10n) / 12n;
-            await pythPriceFeed.setPythAssetId(
-                "0x0000000000000000000000000000000000000003",
+            await pythPriceFeed.setMarketConfig("0x0000000000000000000000000000000000000003", {
+                pythAssetId: "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
+                validTimePeriod: 60,
+                maxDeviationRatio: 1e4,
+                referencePriceAdjustmentMagnification: 1234,
+            });
+            expect(await pythPriceFeed.marketConfig("0x0000000000000000000000000000000000000003")).deep.eq([
                 "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
-            );
-            expect(await pythPriceFeed.pythAssetIds("0x0000000000000000000000000000000000000003")).equal(
-                "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
-            );
+                "10000",
+                "60",
+                "1234",
+            ]);
 
             await pythPriceFeed.setUpdater("0x0000000000000000000000000000000000000003", true);
             expect(await pythPriceFeed.isUpdater("0x0000000000000000000000000000000000000003")).equal(true);
-
-            await pythPriceFeed.setReferencePriceAdjustmentMagnification(
-                "0x0000000000000000000000000000000000000003",
-                100,
-            );
-            expect(
-                await pythPriceFeed.referencePriceAdjustmentMagnifications(
-                    "0x0000000000000000000000000000000000000003",
-                ),
-            ).equal(100);
-
-            await pythPriceFeed.setValidTimePeriod(100);
-            await pythPriceFeed.setMaxDeviationRatio(100);
-
-            expect((await pythPriceFeed.slot())[0]).equal(100n);
-            expect((await pythPriceFeed.slot())[1]).equal(100n);
 
             await expect(
                 pythPriceFeed.connect(notOwner).setPriceX96s(
@@ -243,33 +251,17 @@ describe("PythAdaptor", () => {
                 ),
             ).revertedWithCustomError(pythPriceFeed, "Forbidden");
             await expect(
-                pythPriceFeed
-                    .connect(notOwner)
-                    .setPythAssetId(
-                        "0x0000000000000000000000000000000000000003",
-                        "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
-                    ),
+                pythPriceFeed.connect(notOwner).setMarketConfig("0x0000000000000000000000000000000000000003", {
+                    pythAssetId: "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
+                    validTimePeriod: 60,
+                    maxDeviationRatio: 1e5,
+                    referencePriceAdjustmentMagnification: 0,
+                }),
             ).revertedWithCustomError(pythPriceFeed, "Forbidden");
 
             await expect(
                 pythPriceFeed.connect(notOwner).setUpdater("0x0000000000000000000000000000000000000003", true),
             ).revertedWithCustomError(pythPriceFeed, "Forbidden");
-
-            await expect(
-                pythPriceFeed
-                    .connect(notOwner)
-                    .setReferencePriceAdjustmentMagnification("0x0000000000000000000000000000000000000003", 100),
-            ).revertedWithCustomError(pythPriceFeed, "Forbidden");
-
-            await expect(pythPriceFeed.connect(notOwner).setValidTimePeriod(100)).revertedWithCustomError(
-                pythPriceFeed,
-                "Forbidden",
-            );
-
-            await expect(pythPriceFeed.connect(notOwner).setMaxDeviationRatio(100)).revertedWithCustomError(
-                pythPriceFeed,
-                "Forbidden",
-            );
         });
     });
 });

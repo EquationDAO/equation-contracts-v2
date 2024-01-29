@@ -5,13 +5,6 @@ import "../../core/interfaces/IMarketDescriptor.sol";
 import "./IChainLinkAggregator.sol";
 
 interface IPythPriceFeed {
-    struct Slot {
-        // Maximum deviation ratio between price and ChainLink price.
-        uint32 maxDeviationRatio;
-        // The timeout for price update transactions.
-        uint32 validTimePeriod;
-    }
-
     struct PricePack {
         /// @notice The timestamp when updater uploads the price
         uint64 updateTimestamp;
@@ -28,6 +21,18 @@ interface IPythPriceFeed {
         uint160 priceX96;
     }
 
+    struct MarketConfig {
+        /// @notice The pyth price feed id of which to fetch the price and confidence interval.
+        bytes32 pythAssetId;
+        /// @notice Maximum deviation ratio between price and pyth price.
+        uint32 maxDeviationRatio;
+        /// @notice The timeout for price update transactions.the period (in seconds) that a price feed is considered
+        /// valid since its publish time
+        uint32 validTimePeriod;
+        /// @notice Some market prices are too low, it is necessary to enlarge the price for better display.
+        uint32 referencePriceAdjustmentMagnification;
+    }
+
     /// @notice Emitted when market price updated
     /// @param market Market address
     /// @param priceX96 The price passed in by updater, as a Q64.96
@@ -36,8 +41,9 @@ interface IPythPriceFeed {
     event PriceUpdated(IMarketDescriptor indexed market, uint160 priceX96, uint160 minPriceX96, uint160 maxPriceX96);
 
     /// @notice Emitted when `maxDeviationRatio` changed
-    /// @param newMaxDeviationRatio new `maxDeviationRatio` value
-    event MaxDeviationRatioChanged(uint32 newMaxDeviationRatio);
+    /// @param market Market address
+    /// @param newConfig New market config value
+    event MarketConfigChanged(IMarketDescriptor indexed market, MarketConfig newConfig);
 
     /// @notice stale price, may because of transaction execution too late or breakdown price feed
     /// @param timestamp stale price timestamp
@@ -71,13 +77,13 @@ interface IPythPriceFeed {
     /// @param timestamp The timestamp of price update
     function setPriceX96s(MarketPrice[] calldata marketPrices, uint64 timestamp) external;
 
-    /// @notice Get the pyth asset id of stable market
+    /// @notice Get the pyth asset id of the stable market
     /// @return id The id of stable market asset
     function stableMarketAssetId() external view returns (bytes32 id);
 
-    /// @notice The 0th storage slot in the price feed stores many values, which helps reduce gas
-    /// costs when interacting with the price feed.
-    function slot() external view returns (Slot memory);
+    /// @notice Get valid time period of the stable market
+    /// @return period The period (in seconds) that a price feed is considered valid since its publish time
+    function stableMarketValidTimePeriod() external view returns (uint32 period);
 
     /// @notice `ReferencePriceFeedNotSet` will be ignored when `ignoreReferencePriceFeedError` is true
     function ignoreReferencePriceFeedError() external view returns (bool);
@@ -85,7 +91,7 @@ interface IPythPriceFeed {
     /// @notice Get latest price data for corresponding market.
     /// @param market The market address to query the price data
     /// @return packedData The packed price data
-    function latestPrice(IMarketDescriptor market) external view returns (PricePack memory packedData);
+    function latestPrices(IMarketDescriptor market) external view returns (PricePack memory packedData);
 
     /// @notice Get minimum market price
     /// @param market The market address to query the price
@@ -107,23 +113,13 @@ interface IPythPriceFeed {
     /// @return active Status of updater
     function isUpdater(address account) external returns (bool active);
 
-    /// @notice Set pyth asset id for corresponding market.
+    /// @notice Set market config for corresponding market.
     /// @param market The market address to set
-    /// @param assetId pyth asset id
-    function setPythAssetId(IMarketDescriptor market, bytes32 assetId) external;
+    /// @param marketConfig The packed market config data
+    function setMarketConfig(IMarketDescriptor market, MarketConfig calldata marketConfig) external;
 
-    /// @notice Set maximum deviation ratio between price and pyth price.
-    /// If exceeded, the updated price will refer to pyth price.
-    /// @param maxDeviationRatio Maximum deviation ratio
-    function setMaxDeviationRatio(uint32 maxDeviationRatio) external;
-
-    /// @notice Set the period (in seconds) that a price feed is considered valid since its publish time
-    /// @param validTimePeriod The period (in seconds) that a price feed is considered valid since its publish time
-    function setValidTimePeriod(uint32 validTimePeriod) external;
-
-    /// @notice Some market prices are too low, it is necessary to enlarge the price for better display. Set the
-    /// magnification for the corresponding market
-    /// @param market The market address to set
-    /// @param magnification Positive number of magnification.
-    function setReferencePriceAdjustmentMagnification(IMarketDescriptor market, uint160 magnification) external;
+    /// @notice Get market configuration for updating price
+    /// @param market The market address to query the configuration
+    /// @return marketConfig The packed market config data
+    function marketConfig(IMarketDescriptor market) external view returns (MarketConfig memory marketConfig);
 }
