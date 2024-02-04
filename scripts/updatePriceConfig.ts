@@ -29,7 +29,7 @@ async function main() {
             liquidationVertexIndex: priceCfg.liquidationVertexIndex,
             vertices: vertices,
         });
-        console.log(`update price config for ${item.market}`);
+        console.log(`update price config for ${item.name}`);
     }
 }
 
