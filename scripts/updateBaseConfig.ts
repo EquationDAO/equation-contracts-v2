@@ -29,7 +29,7 @@ async function main() {
         };
 
         await marketManager.updateMarketBaseConfig(item.market, newBaseCfg);
-        console.log(`update base config for ${item.market}`);
+        console.log(`update base config for ${item.name}`);
     }
 }
 
